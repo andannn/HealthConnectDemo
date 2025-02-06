@@ -2,19 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
     <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
     <uses-permission android:name="android.permission.health.READ_STEPS"/>
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTES"/>
     <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
 
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND" />
 
     <application
+        android:name=".HealthApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,6 +20,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HealthConnectDemo"
         tools:targetApi="31">
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <activity
             android:name=".PermissionsRationaleActivity"
@@ -57,10 +65,10 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".HealthConnectService"
-            android:foregroundServiceType="health"
-            android:exported="true" />
+<!--        <service-->
+<!--            android:name=".HealthConnectService"-->
+<!--            android:foregroundServiceType="health"-->
+<!--            android:exported="true" />-->
 
     </application>
 

@@ -1,11 +1,6 @@
 package com.andannn.healthconnectdemo
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,16 +12,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.lifecycle.lifecycleScope
+import com.andannn.healthconnectdemo.api.HealthConnectAPI
+import com.andannn.healthconnectdemo.api.HealthConnectAPIImpl
 import com.andannn.healthconnectdemo.ui.theme.HealthConnectDemoTheme
-import kotlinx.coroutines.delay
+import com.andannn.healthconnectdemo.worker.SyncHelper
 import kotlinx.coroutines.launch
-import java.time.temporal.ChronoUnit
 
 private const val TAG = "MainActivity"
 val PERMISSIONS =
@@ -34,47 +29,57 @@ val PERMISSIONS =
         HealthPermission.getReadPermission(HeartRateRecord::class),
         HealthPermission.getReadPermission(StepsRecord::class),
     )
-class MainActivity : ComponentActivity() {
-    private var api: HealthConnectAPI? = null
-    private val requestPermissionActivityContract = PermissionController.createRequestPermissionResultContract()
-    private val requestPermissionsLauncher = registerForActivityResult(requestPermissionActivityContract) { granted ->
-        if (granted.containsAll(PERMISSIONS)) {
-            // Permissions successfully granted
-        } else {
-            // Lack of required permissions
-        }
-    }
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            val myBinder = binder as HealthConnectService.HealthConnectBinder
-            api = myBinder.getService()
 
-            lifecycleScope.launch {
-                checkPermissionsAndRun()
-                api!!.readStepsByTimeRange(
-                    startTime = java.time.Instant.now().minus(10, ChronoUnit.DAYS),
-                    endTime = java.time.Instant.now()
-                )
-                while (true) {
-                    delay(1000)
-//                    api?.foo()
-                }
+class MainActivity : ComponentActivity() {
+    private val requestPermissionActivityContract =
+        PermissionController.createRequestPermissionResultContract()
+    private val requestPermissionsLauncher =
+        registerForActivityResult(requestPermissionActivityContract) { granted ->
+            if (granted.containsAll(PERMISSIONS)) {
+                // Permissions successfully granted
+            } else {
+                // Lack of required permissions
             }
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
+    private val api: HealthConnectAPI by lazy {
+        HealthConnectAPIImpl(this)
     }
+//    private val serviceConnection = object : ServiceConnection {
+//        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+//            val myBinder = binder as HealthConnectService.HealthConnectBinder
+//            api = myBinder.getService()
+//
+//            lifecycleScope.launch {
+//                checkPermissionsAndRun()
+//                api!!.foo()
+//                api!!.readStepsByTimeRange(
+//                    startTime = java.time.Instant.now().minus(1, ChronoUnit.HOURS),
+//                    endTime = java.time.Instant.now()
+//                )
+//                while (true) {
+//                    delay(1000)
+////                    api?.foo()
+//                }
+//            }
+//        }
+//
+//        override fun onServiceDisconnected(name: ComponentName?) {
+//        }
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val intent = Intent(this, HealthConnectService::class.java)
+//        val intent = Intent(this, HealthConnectService::class.java)
+//
+//        startService(intent)
+//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        startService(intent)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-
+        lifecycleScope.launch {
+            SyncHelper.registerSyncScheduleWorker(application)
+        }
         setContent {
             HealthConnectDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -90,11 +95,11 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        unbindService(serviceConnection)
+//        unbindService(serviceConnection)
     }
 
     private suspend fun checkPermissionsAndRun() {
-        val granted = api!!.getGrantedPermissions()
+        val granted = api.getGrantedPermissions()
         Log.d(TAG, "checkPermissionsAndRun: granted $granted")
         if (granted.containsAll(PERMISSIONS)) {
             // Permissions already granted; proceed with inserting or reading data
