@@ -46,7 +46,6 @@ internal class HealthConnectAPIImpl(
         }
     }
 
-
     override suspend fun getChangesFromToken(token: String) = withClientOrThrow(context) { client ->
         Log.d(TAG, "getChangesFromToken: token $token")
         var nextChangesToken = token

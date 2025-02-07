@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
@@ -16,7 +18,6 @@ import com.andannn.healthdata.internal.api.NoPermissionException
 import com.andannn.healthdata.internal.api.RemoteApiException
 import com.andannn.healthdata.internal.api.TokenExpiredException
 import com.andannn.healthdata.internal.database.dao.HealthDataRecordDao
-import com.andannn.healthdata.internal.database.entity.BaseRecordEntity
 import com.andannn.healthdata.internal.database.entity.toEntity
 import com.andannn.healthdata.internal.token.SyncTokenProvider
 import java.time.Instant
@@ -28,6 +29,7 @@ private const val TAG = "SyncScheduleWorker"
 // The record types that we are interested in syncing.
 private val recordTypes: Set<KClass<out Record>> = setOf(
     StepsRecord::class,
+    SleepSessionRecord::class,
 )
 
 internal class SyncScheduleWorker(
@@ -38,20 +40,36 @@ internal class SyncScheduleWorker(
     private val syncTokenProvider: SyncTokenProvider
 ) : CoroutineWorker(appContext, params) {
 
-// TODO: filter recordTypes based on the permissions granted by the user.
-//  private val permissionGrantedRecordTypes = emptySet<KClass<out Record>>()
+    private val permissionGrantedRecordTypes = mutableSetOf<KClass<out Record>>()
+
+    private val grantedPermissions
+        get() = permissionGrantedRecordTypes.map { HealthPermission.getReadPermission(it) }.toSet()
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork: WorkStart")
-// TODO: filter.
-//.     permissionGrantedRecordTypes = recordTypes.filter { permissionGranted(it) }
 
-        val lastSyncToken = syncTokenProvider.getLastSyncToken()
         try {
+            val grantedPermissions = healthConnectAPI.getGrantedPermissions()
+            permissionGrantedRecordTypes.addAll(
+                recordTypes.filter {
+                    grantedPermissions.contains(HealthPermission.getReadPermission(it))
+                }
+            )
+            Log.d(TAG, "doWork: permissionGrantedRecordTypes $permissionGrantedRecordTypes")
+
+
+            if (permissionGrantedRecordTypes.isEmpty()) {
+                Log.d(TAG, "doWork: No permission granted, do nothing")
+                return Result.success()
+            }
+
+            val lastSyncToken = syncTokenProvider.getLastSyncToken(
+                grantedPermissions
+            )
+
             if (lastSyncToken == null) {
                 Log.d(TAG, "doWork: LastSyncToken is null, do initial sync")
                 doInitialSync()
-                createNewTokenAndSave()
                 return Result.success()
             }
 
@@ -95,7 +113,6 @@ internal class SyncScheduleWorker(
             } catch (e: TokenExpiredException) {
                 Log.d(TAG, "token is invalid!, clear db and do initial sync $e")
                 doInitialSync()
-                createNewTokenAndSave()
                 return Result.success()
             }
 
@@ -115,19 +132,19 @@ internal class SyncScheduleWorker(
         }
     }
 
-    private suspend fun createNewTokenAndSave() {
-        val token = healthConnectAPI.getChangesToken(recordTypes)
-        syncTokenProvider.setSyncToken(token)
-    }
-
     private suspend fun doInitialSync() {
-        recordTypes.forEach { recordType ->
+        permissionGrantedRecordTypes.forEach { recordType ->
             try {
                 syncRecord(recordType)
             } catch (permissionException: NoPermissionException) {
                 // Ignore the record type if the user has revoked permission.
+                Log.e(TAG, "doInitialSync $permissionException")
             }
         }
+
+        // Save token.
+        val token = healthConnectAPI.getChangesToken(permissionGrantedRecordTypes)
+        syncTokenProvider.setSyncToken(token, grantedPermissions)
     }
 
     private suspend fun syncRecord(
@@ -146,10 +163,17 @@ internal class SyncScheduleWorker(
         recordType: KClass<out Record>,
         records: List<Record>
     ) {
+        Log.d(TAG, "upsertRecords: recordType $recordType, records ${records.size}")
         when (recordType) {
             StepsRecord::class -> {
                 healthDataRecordDao.upsertStepRecords(
                     records.filterIsInstance<StepsRecord>().map { it.toEntity() }
+                )
+            }
+
+            SleepSessionRecord::class -> {
+                healthDataRecordDao.upsertSleepRecords(
+                    records.filterIsInstance<SleepSessionRecord>().map { it.toEntity() }
                 )
             }
         }

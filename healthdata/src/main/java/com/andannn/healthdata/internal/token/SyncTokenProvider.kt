@@ -2,11 +2,24 @@ package com.andannn.healthdata.internal.token
 
 import android.content.Context
 import android.util.Log
+import kotlinx.serialization.json.Json
 
 interface SyncTokenProvider {
-    fun getLastSyncToken(): String?
+    /**
+     * Get the last sync token.
+     *
+     *
+     * @return last sync token if the [currentPermissions] is the same as last sync token.
+     */
+    fun getLastSyncToken(currentPermissions: Set<String>): String?
 
-    fun setSyncToken(token: String)
+    /**
+     * Set the last sync token.
+     *
+     * @param token the sync token to set.
+     * @param permissions the permissions that the token is associated with.
+     */
+    fun setSyncToken(token: String, permissions: Set<String>? = null)
 }
 
 fun buildSyncTokenProvider(context: Context): SyncTokenProvider {
@@ -22,13 +35,24 @@ internal class SyncTokenProviderImpl(
         Context.MODE_PRIVATE
     )
 
-    override fun getLastSyncToken(): String? {
+    override fun getLastSyncToken(currentPermissions: Set<String>): String? {
+        val lastPermissions = sharedPreferences.getString("permissions", null)?.let {
+            Json.decodeFromString<Set<String>>(it)
+        } ?: return null
+
+        if (lastPermissions != currentPermissions) {
+            return null
+        }
         return sharedPreferences.getString("sync_token", null)
     }
 
-    override fun setSyncToken(token: String) {
-        Log.d(TAG, "setSyncToken: token $token")
+    override fun setSyncToken(token: String, permissions: Set<String>?) {
+        Log.d(TAG, "setSyncToken: token $token, permissions $permissions")
         sharedPreferences.edit().putString("sync_token", token).apply()
+        if (permissions != null) {
+            sharedPreferences.edit().putString("permissions", Json.encodeToString(permissions))
+                .apply()
+        }
     }
 
     companion object {

@@ -74,6 +74,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             registerSyncScheduleWorker(application)
         }
+
         setContent {
             HealthConnectDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
