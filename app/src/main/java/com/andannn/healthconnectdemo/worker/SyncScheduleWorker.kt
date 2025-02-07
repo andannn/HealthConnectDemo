@@ -3,10 +3,8 @@ package com.andannn.healthconnectdemo.worker
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
-import androidx.health.connect.client.records.FloorsClimbedRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.StepsRecord
 import androidx.work.CoroutineWorker
@@ -56,7 +54,7 @@ object SyncHelper {
 
             WorkManager.getInstance(context = application).enqueueUniquePeriodicWork(
                 "read_health_connect",
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
 
@@ -133,19 +131,20 @@ internal class SyncScheduleWorker(
                 Log.d(TAG, "getChangesFromToken: changes E token: $lastSyncToken")
                 val (newToken, changes) = healthConnectAPI.getChangesFromToken(lastSyncToken)
                 Log.d(TAG, "getChangesFromToken: changes X changes $changes")
-                // TODO: save changes to database.
 
                 val deletedRecordIds = mutableListOf<String>()
-                val upsertChangeMap = mutableMapOf<KClass<out Record>, List<Change>>()
+                val upsertChangeMap = mutableMapOf<KClass<out Record>, List<Record>>()
                 changes.forEach { change ->
                     when (change) {
                         is DeletionChange -> {
+                            Log.d(TAG, "doWork: DeletionChange ${change.recordId}")
                             deletedRecordIds.add(change.recordId)
                         }
 
                         is UpsertionChange -> {
+                            Log.d(TAG, "doWork: UpsertionChange ${change.record}")
                             upsertChangeMap[change.record::class] =
-                                upsertChangeMap.getOrPut(change.record::class) { emptyList() } + change
+                                upsertChangeMap.getOrPut(change.record::class) { emptyList() } + change.record
                         }
                     }
                 }
@@ -154,12 +153,11 @@ internal class SyncScheduleWorker(
                     healthDataRecordDao.deleteRecordsByIds(deletedRecordIds)
                 }
 
-                upsertChangeMap.forEach { (recordType, changes) ->
+                upsertChangeMap.forEach { (recordType, records) ->
                     when (recordType) {
                         StepsRecord::class -> {
-                            val records = changes.filterIsInstance<StepsRecord>()
                             healthDataRecordDao.upsertStepRecords(
-                                records.map { it.toEntity() }
+                                records.filterIsInstance<StepsRecord>().map { it.toEntity() }
                             )
                         }
                     }
