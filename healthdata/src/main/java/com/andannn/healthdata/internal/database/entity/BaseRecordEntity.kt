@@ -1,4 +1,4 @@
-package com.andannn.healthdata.internal.database
+package com.andannn.healthdata.internal.database.entity
 
 import java.time.LocalDateTime
 

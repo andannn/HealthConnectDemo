@@ -9,7 +9,6 @@ import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
 import androidx.health.connect.client.records.Record
-import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -47,23 +46,6 @@ internal class HealthConnectAPIImpl(
         }
     }
 
-    override suspend fun readStepsByTimeRange(
-        startTime: Instant,
-        endTime: Instant
-    ) = withClientOrThrow(context) { client ->
-        val response = wrapException {
-            client.readRecords(
-                ReadRecordsRequest(
-                    StepsRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
-                )
-            )
-        }
-
-        response.records.also {
-            Log.d(TAG, "readStepsByTimeRange: ${it}")
-        }
-    }
 
     override suspend fun getChangesFromToken(token: String) = withClientOrThrow(context) { client ->
         Log.d(TAG, "getChangesFromToken: token $token")
@@ -97,6 +79,24 @@ internal class HealthConnectAPIImpl(
             )
         }
     }
+
+    override suspend fun readRecords(
+        recordType: KClass<out Record>,
+        startTime: Instant,
+        endTime: Instant
+    ) =
+        withClientOrThrow(context) { client ->
+            val response = wrapException {
+                client.readRecords(
+                    ReadRecordsRequest(
+                        recordType,
+                        timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    )
+                )
+            }
+
+            response.records
+        }
 }
 
 private inline fun <T> wrapException(block: () -> T): T {

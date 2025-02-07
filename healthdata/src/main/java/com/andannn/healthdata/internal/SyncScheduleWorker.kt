@@ -15,8 +15,9 @@ import com.andannn.healthdata.internal.api.HealthConnectAPI
 import com.andannn.healthdata.internal.api.NoPermissionException
 import com.andannn.healthdata.internal.api.RemoteApiException
 import com.andannn.healthdata.internal.api.TokenExpiredException
-import com.andannn.healthdata.internal.database.HealthDataRecordDao
-import com.andannn.healthdata.internal.database.toEntity
+import com.andannn.healthdata.internal.database.dao.HealthDataRecordDao
+import com.andannn.healthdata.internal.database.entity.BaseRecordEntity
+import com.andannn.healthdata.internal.database.entity.toEntity
 import com.andannn.healthdata.internal.token.SyncTokenProvider
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -37,8 +38,14 @@ internal class SyncScheduleWorker(
     private val syncTokenProvider: SyncTokenProvider
 ) : CoroutineWorker(appContext, params) {
 
+// TODO: filter recordTypes based on the permissions granted by the user.
+//  private val permissionGrantedRecordTypes = emptySet<KClass<out Record>>()
+
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork: WorkStart")
+// TODO: filter.
+//.     permissionGrantedRecordTypes = recordTypes.filter { permissionGranted(it) }
+
         val lastSyncToken = syncTokenProvider.getLastSyncToken()
         try {
             if (lastSyncToken == null) {
@@ -114,28 +121,42 @@ internal class SyncScheduleWorker(
     }
 
     private suspend fun doInitialSync() {
-        // TODO: clear database.
-
-        recordTypes.forEach {
+        recordTypes.forEach { recordType ->
             try {
-                when (it) {
-                    StepsRecord::class -> syncStepRecord()
-                }
+                syncRecord(recordType)
             } catch (permissionException: NoPermissionException) {
                 // Ignore the record type if the user has revoked permission.
             }
         }
     }
 
-    private suspend fun syncStepRecord() {
-        val record = healthConnectAPI.readStepsByTimeRange(
-            startTime = Instant.now().minus(1, ChronoUnit.DAYS),
+    private suspend fun syncRecord(
+        recordType: KClass<out Record>,
+    ) {
+        val records = healthConnectAPI.readRecords(
+            recordType = recordType,
+            startTime = Instant.now().minus(INITIAL_SYNC_DAYS, ChronoUnit.DAYS),
             endTime = Instant.now()
         )
 
-        healthDataRecordDao.upsertStepRecords(
-            record.map { it.toEntity() }
-        )
+        upsertRecords(recordType, records)
+    }
+
+    private suspend fun upsertRecords(
+        recordType: KClass<out Record>,
+        records: List<Record>
+    ) {
+        when (recordType) {
+            StepsRecord::class -> {
+                healthDataRecordDao.upsertStepRecords(
+                    records.filterIsInstance<StepsRecord>().map { it.toEntity() }
+                )
+            }
+        }
+    }
+
+    companion object {
+        const val INITIAL_SYNC_DAYS = 30L
     }
 }
 
