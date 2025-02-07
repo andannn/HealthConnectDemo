@@ -1,4 +1,4 @@
-package com.andannn.healthconnectdemo.worker
+package com.andannn.healthdata.worker
 
 import android.app.Application
 import android.content.Context
@@ -15,16 +15,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.andannn.healthconnectdemo.HealthConnectApiProvider
-import com.andannn.healthconnectdemo.UserDataProvider
-import com.andannn.healthconnectdemo.UserDataProviderImpl
-import com.andannn.healthconnectdemo.api.ClientUnavailableException
-import com.andannn.healthconnectdemo.api.HealthConnectAPI
-import com.andannn.healthconnectdemo.api.NoPermissionException
-import com.andannn.healthconnectdemo.api.RemoteApiException
-import com.andannn.healthconnectdemo.api.TokenExpiredException
-import com.andannn.healthconnectdemo.db.HealthDataRecordDao
-import com.andannn.healthconnectdemo.db.toEntity
+import com.andannn.healthdata.HealthRepositoryProvider
+import com.andannn.healthdata.api.HealthConnectAPI
+import com.andannn.healthdata.database.HealthDataRecordDao
+import com.andannn.healthdata.database.toEntity
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
@@ -38,12 +32,11 @@ object SyncHelper {
      * If background sync is not available, perform the sync in the foreground.
      */
     suspend fun registerSyncScheduleWorker(application: Application) {
-        if (application !is HealthConnectApiProvider) {
+        if (application !is HealthRepositoryProvider) {
             throw IllegalStateException("Application must implement HealthConnectApiProvider")
         }
 
-        val api = application.healthConnectAPI
-        val isBackgroundSyncAvailable = api.isBackgroundSyncAvailable()
+        val isBackgroundSyncAvailable = application.repository.isBackgroundSyncAvailable()
 
         Log.d(TAG, "onCreate: isBackgroundSyncAvailable $isBackgroundSyncAvailable")
 
@@ -74,7 +67,8 @@ object SyncHelper {
 
 class SyncScheduleWorkerFactory(
     private val healthConnectAPI: HealthConnectAPI,
-    private val healthDataRecordDao: HealthDataRecordDao
+    private val healthDataRecordDao: HealthDataRecordDao,
+    private val syncTokenProvider: SyncTokenProvider
 ) : WorkerFactory() {
     override fun createWorker(
         appContext: Context,
@@ -88,7 +82,8 @@ class SyncScheduleWorkerFactory(
                     appContext,
                     workerParameters,
                     healthConnectAPI,
-                    healthDataRecordDao
+                    healthDataRecordDao,
+                    syncTokenProvider
                 )
             }
 
@@ -111,14 +106,12 @@ internal class SyncScheduleWorker(
     params: WorkerParameters,
     private val healthConnectAPI: HealthConnectAPI,
     private val healthDataRecordDao: HealthDataRecordDao,
+    private val syncTokenProvider: SyncTokenProvider
 ) : CoroutineWorker(appContext, params) {
-    private val userDataProvider: UserDataProvider by lazy {
-        UserDataProviderImpl(appContext)
-    }
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "doWork: WorkStart")
-        val lastSyncToken = userDataProvider.getLastSyncToken()
+        val lastSyncToken = syncTokenProvider.getLastSyncToken()
         try {
             if (lastSyncToken == null) {
                 Log.d(TAG, "doWork: LastSyncToken is null, do initial sync")
@@ -163,8 +156,8 @@ internal class SyncScheduleWorker(
                     }
                 }
 
-                userDataProvider.setSyncToken(newToken)
-            } catch (e: TokenExpiredException) {
+                syncTokenProvider.setSyncToken(newToken)
+            } catch (e: com.andannn.healthdata.api.TokenExpiredException) {
                 Log.d(TAG, "token is invalid!, clear db and do initial sync $e")
                 doInitialSync()
                 createNewTokenAndSave()
@@ -172,15 +165,15 @@ internal class SyncScheduleWorker(
             }
 
             return Result.success()
-        } catch (e: ClientUnavailableException) {
+        } catch (e: com.andannn.healthdata.api.ClientUnavailableException) {
             Log.e(TAG, "$e")
             // current platform does not support HealthConnect, so we can't sync.
             return Result.failure()
-        } catch (e: RemoteApiException) {
+        } catch (e: com.andannn.healthdata.api.RemoteApiException) {
             Log.e(TAG, "$e")
             // error communicating with the HealthConnect API.
             return Result.retry()
-        } catch (e: NoPermissionException) {
+        } catch (e: com.andannn.healthdata.api.NoPermissionException) {
             Log.e(TAG, "$e")
             // user has revoked permissions, so we can't sync.
             return Result.failure()
@@ -189,7 +182,7 @@ internal class SyncScheduleWorker(
 
     private suspend fun createNewTokenAndSave() {
         val token = healthConnectAPI.getChangesToken(recordTypes)
-        userDataProvider.setSyncToken(token)
+        syncTokenProvider.setSyncToken(token)
     }
 
     private suspend fun doInitialSync() {
@@ -200,7 +193,7 @@ internal class SyncScheduleWorker(
                 when (it) {
                     StepsRecord::class -> syncStepRecord()
                 }
-            } catch (permissionException: NoPermissionException) {
+            } catch (permissionException: com.andannn.healthdata.api.NoPermissionException) {
                 // Ignore the record type if the user has revoked permission.
             }
         }

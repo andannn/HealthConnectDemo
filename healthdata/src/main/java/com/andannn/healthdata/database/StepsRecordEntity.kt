@@ -1,4 +1,4 @@
-package com.andannn.healthconnectdemo.db
+package com.andannn.healthdata.database
 
 import androidx.health.connect.client.records.StepsRecord
 import java.time.Instant

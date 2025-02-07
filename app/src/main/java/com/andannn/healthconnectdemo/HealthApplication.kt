@@ -2,43 +2,47 @@ package com.andannn.healthconnectdemo
 
 import android.app.Application
 import androidx.work.Configuration
-import com.andannn.healthconnectdemo.api.HealthConnectAPI
-import com.andannn.healthconnectdemo.api.HealthConnectAPIImpl
-import com.andannn.healthconnectdemo.db.HealthDataRecordDao
-import com.andannn.healthconnectdemo.db.HealthDataRecordDaoImpl
-import com.andannn.healthconnectdemo.worker.SyncScheduleWorkerFactory
+import com.andannn.healthdata.HealthDataRepository
+import com.andannn.healthdata.HealthRepositoryProvider
+import com.andannn.healthdata.api.HealthConnectAPI
+import com.andannn.healthdata.api.buildHealthConnectAPI
+import com.andannn.healthdata.buildHealthDataRepository
+import com.andannn.healthdata.database.HealthDataRecordDatabase
+import com.andannn.healthdata.database.buildHealthDataRecordDatabase
+import com.andannn.healthdata.worker.SyncScheduleWorkerFactory
+import com.andannn.healthdata.worker.SyncTokenProvider
+import com.andannn.healthdata.worker.buildSyncTokenProvider
 
-interface HealthConnectApiProvider {
-    val healthConnectAPI: HealthConnectAPI
+class HealthApplication : Application(), Configuration.Provider, HealthRepositoryProvider {
 
-    val healthDataRecordDao: HealthDataRecordDao
-}
-
-class HealthApplication : Application(), Configuration.Provider, HealthConnectApiProvider {
-
-    override val healthConnectAPI: HealthConnectAPI by lazy {
-        HealthConnectAPIImpl(this)
-    }
-    override val healthDataRecordDao: HealthDataRecordDao by lazy {
-        HealthDataRecordDaoImpl(this)
+    private val healthConnectAPI: HealthConnectAPI by lazy {
+        buildHealthConnectAPI(this)
     }
 
-    companion object {
-        private var sInstance: HealthApplication? = null
-        fun getInstance(): HealthApplication {
-            return sInstance!!
-        }
+    private val healthDataRecordDatabase: HealthDataRecordDatabase by lazy {
+        buildHealthDataRecordDatabase(this)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        sInstance = this
+    private val syncTokenProvider: SyncTokenProvider by lazy {
+        buildSyncTokenProvider(this)
     }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(
-                SyncScheduleWorkerFactory(healthConnectAPI, healthDataRecordDao)
+                SyncScheduleWorkerFactory(
+                    healthConnectAPI,
+                    healthDataRecordDatabase.getHealthDataRecordDao(),
+                    syncTokenProvider
+                )
             )
             .build()
+
+    override val repository: HealthDataRepository by lazy {
+        buildHealthDataRepository(
+            healthConnectAPI = healthConnectAPI,
+            syncTokenProvider = syncTokenProvider,
+            database = healthDataRecordDatabase
+        )
+    }
 }

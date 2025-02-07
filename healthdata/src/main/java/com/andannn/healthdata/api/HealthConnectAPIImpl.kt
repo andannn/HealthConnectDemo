@@ -1,4 +1,4 @@
-package com.andannn.healthconnectdemo.api
+package com.andannn.healthdata.api
 
 import android.content.Context
 import android.os.RemoteException
@@ -18,7 +18,7 @@ import java.io.IOException
 import java.time.Instant
 import kotlin.reflect.KClass
 
-internal class HealthConnectAPIImpl(
+class HealthConnectAPIImpl(
     private val context: Context
 ) : HealthConnectAPI {
     @OptIn(ExperimentalFeatureAvailabilityApi::class)

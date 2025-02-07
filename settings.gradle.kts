@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "HealthConnectDemo"
 include(":app")
+include(":healthdata")

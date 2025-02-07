@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":healthdata"))
+
     implementation(libs.androidx.connect.client)
 
     implementation(libs.androidx.core.ktx)

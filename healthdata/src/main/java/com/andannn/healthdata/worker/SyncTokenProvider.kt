@@ -1,18 +1,21 @@
-package com.andannn.healthconnectdemo
+package com.andannn.healthdata.worker
 
 import android.content.Context
 import android.util.Log
 
-interface UserDataProvider {
+interface SyncTokenProvider {
     fun getLastSyncToken(): String?
 
     fun setSyncToken(token: String)
 }
 
-private const val TAG = "UserDataProvider"
-class UserDataProviderImpl(
+fun buildSyncTokenProvider(context: Context): SyncTokenProvider {
+    return SyncTokenProviderImpl(context)
+}
+
+internal class SyncTokenProviderImpl(
     context: Context
-) : UserDataProvider {
+) : SyncTokenProvider {
 
     private val sharedPreferences = context.getSharedPreferences(
         "sync_token_shared_preferences",
@@ -26,5 +29,9 @@ class UserDataProviderImpl(
     override fun setSyncToken(token: String) {
         Log.d(TAG, "setSyncToken: token $token")
         sharedPreferences.edit().putString("sync_token", token).apply()
+    }
+
+    companion object {
+        private const val TAG = "UserDataProvider"
     }
 }

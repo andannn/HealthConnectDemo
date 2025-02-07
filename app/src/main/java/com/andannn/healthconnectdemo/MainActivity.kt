@@ -17,10 +17,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.lifecycle.lifecycleScope
-import com.andannn.healthconnectdemo.api.HealthConnectAPI
-import com.andannn.healthconnectdemo.api.HealthConnectAPIImpl
 import com.andannn.healthconnectdemo.ui.theme.HealthConnectDemoTheme
-import com.andannn.healthconnectdemo.worker.SyncHelper
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
@@ -42,8 +39,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    private val api: HealthConnectAPI by lazy {
-        HealthConnectAPIImpl(this)
+    private val api: com.andannn.healthdata.api.HealthConnectAPI by lazy {
+        com.andannn.healthdata.api.HealthConnectAPIImpl(this)
     }
 //    private val serviceConnection = object : ServiceConnection {
 //        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
@@ -78,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
 
         lifecycleScope.launch {
-            SyncHelper.registerSyncScheduleWorker(application)
+            com.andannn.healthdata.worker.SyncHelper.registerSyncScheduleWorker(application)
         }
         setContent {
             HealthConnectDemoTheme {

@@ -1,5 +1,6 @@
-package com.andannn.healthconnectdemo.api
+package com.andannn.healthdata.api
 
+import android.content.Context
 import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.StepsRecord
@@ -71,4 +72,8 @@ interface HealthConnectAPI {
         recordTypes: Set<KClass<out Record>>,
         dataOriginFilters: Set<DataOrigin> = setOf()
     ): String
+}
+
+fun buildHealthConnectAPI(context: Context): HealthConnectAPI {
+    return HealthConnectAPIImpl(context)
 }
