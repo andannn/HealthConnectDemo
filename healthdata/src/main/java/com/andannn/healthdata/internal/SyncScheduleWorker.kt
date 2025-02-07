@@ -40,8 +40,10 @@ internal class SyncScheduleWorker(
     private val syncTokenProvider: SyncTokenProvider
 ) : CoroutineWorker(appContext, params) {
 
+    // The record types that the user has granted permission to.
     private val permissionGrantedRecordTypes = mutableSetOf<KClass<out Record>>()
 
+    // The permissions that we need to sync the record types.
     private val grantedPermissions
         get() = permissionGrantedRecordTypes.map { HealthPermission.getReadPermission(it) }.toSet()
 
@@ -49,14 +51,13 @@ internal class SyncScheduleWorker(
         Log.d(TAG, "doWork: WorkStart")
 
         try {
-            val grantedPermissions = healthConnectAPI.getGrantedPermissions()
+            val allGrantedPermission = healthConnectAPI.getGrantedPermissions()
             permissionGrantedRecordTypes.addAll(
                 recordTypes.filter {
-                    grantedPermissions.contains(HealthPermission.getReadPermission(it))
+                    allGrantedPermission.contains(HealthPermission.getReadPermission(it))
                 }
             )
             Log.d(TAG, "doWork: permissionGrantedRecordTypes $permissionGrantedRecordTypes")
-
 
             if (permissionGrantedRecordTypes.isEmpty()) {
                 Log.d(TAG, "doWork: No permission granted, do nothing")

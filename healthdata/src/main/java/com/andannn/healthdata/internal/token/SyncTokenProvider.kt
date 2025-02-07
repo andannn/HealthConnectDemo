@@ -40,6 +40,7 @@ internal class SyncTokenProviderImpl(
             Json.decodeFromString<Set<String>>(it)
         } ?: return null
 
+        Log.d(TAG, "getLastSyncToken: lastPermissions $lastPermissions, currentPermissions $currentPermissions")
         if (lastPermissions != currentPermissions) {
             return null
         }
