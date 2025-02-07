@@ -7,13 +7,11 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.andannn.healthdata.internal.database.Tables
 import com.andannn.healthdata.internal.database.entity.BaseColumn
-import com.andannn.healthdata.internal.database.entity.BaseRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
-import com.andannn.healthdata.internal.database.entity.StepRecordColumns
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
 
 @Dao
-interface HealthDataRecordDao {
+internal interface HealthDataRecordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertStepRecords(stepsRecord: List<StepsRecordEntity>)

@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import kotlinx.serialization.json.Json
 
-interface SyncTokenProvider {
+internal interface SyncTokenProvider {
     /**
      * Get the last sync token.
      *
@@ -22,7 +22,7 @@ interface SyncTokenProvider {
     fun setSyncToken(token: String, permissions: Set<String>? = null)
 }
 
-fun buildSyncTokenProvider(context: Context): SyncTokenProvider {
+internal fun buildSyncTokenProvider(context: Context): SyncTokenProvider {
     return SyncTokenProviderImpl(context)
 }
 

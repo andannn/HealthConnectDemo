@@ -2,7 +2,7 @@ package com.andannn.healthdata.internal.database.entity
 
 import java.time.LocalDateTime
 
-object BaseColumn {
+internal object BaseColumn {
     const val ID = "step_record_id"
     const val DATA_ORIGIN_PACKAGE_NAME = "data_origin_package_name"
     const val LAST_MODIFIED_TIME = "last_modified_time"
@@ -10,7 +10,7 @@ object BaseColumn {
     const val END_TIME = "end_time"
 }
 
-interface BaseRecordEntity {
+internal interface BaseRecordEntity {
     val id: String
 
     val dataOriginPackageName: String

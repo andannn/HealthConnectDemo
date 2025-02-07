@@ -15,7 +15,7 @@ internal object StepRecordColumns {
 }
 
 @Entity(tableName = STEPS_RECORD_TABLE)
-data class StepsRecordEntity(
+internal data class StepsRecordEntity(
     @ColumnInfo(name = BaseColumn.ID) @PrimaryKey override val id: String,
     @ColumnInfo(name = BaseColumn.DATA_ORIGIN_PACKAGE_NAME) override val dataOriginPackageName: String,
     @ColumnInfo(name = BaseColumn.LAST_MODIFIED_TIME) override val lastModifiedTime: LocalDateTime,
@@ -24,7 +24,7 @@ data class StepsRecordEntity(
     @ColumnInfo(name = StepRecordColumns.COUNT) val count: Long,
 ) : BaseRecordEntity, IntervalRecordEntity
 
-fun StepsRecord.toEntity() = StepsRecordEntity(
+internal fun StepsRecord.toEntity() = StepsRecordEntity(
     id = metadata.id,
     dataOriginPackageName = metadata.dataOrigin.packageName,
     lastModifiedTime = toLocalDataTime(metadata.lastModifiedTime),
@@ -33,6 +33,6 @@ fun StepsRecord.toEntity() = StepsRecordEntity(
     count = count,
 )
 
-fun toLocalDataTime(
+internal fun toLocalDataTime(
     instant: Instant, zoneOffset: ZoneOffset? = null
 ): LocalDateTime = LocalDateTime.ofInstant(instant, zoneOffset ?: ZoneId.systemDefault())

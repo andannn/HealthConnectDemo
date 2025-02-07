@@ -12,7 +12,7 @@ internal object SleepSessionRecordColumn {
 }
 
 @Entity(tableName = SLEEP_SESSION_RECORD_TABLE)
-data class SleepSessionRecordEntity(
+internal data class SleepSessionRecordEntity(
     @ColumnInfo(name = BaseColumn.ID) @PrimaryKey override val id: String,
     @ColumnInfo(name = BaseColumn.DATA_ORIGIN_PACKAGE_NAME) override val dataOriginPackageName: String,
     @ColumnInfo(name = BaseColumn.LAST_MODIFIED_TIME) override val lastModifiedTime: LocalDateTime,
@@ -21,7 +21,7 @@ data class SleepSessionRecordEntity(
     @ColumnInfo(name = SleepSessionRecordColumn.TITLE) val title: String,
 ) : BaseRecordEntity, IntervalRecordEntity
 
-fun SleepSessionRecord.toEntity() = SleepSessionRecordEntity(
+internal fun SleepSessionRecord.toEntity() = SleepSessionRecordEntity(
     id = metadata.id,
     dataOriginPackageName = metadata.dataOrigin.packageName,
     lastModifiedTime = toLocalDataTime(metadata.lastModifiedTime),
