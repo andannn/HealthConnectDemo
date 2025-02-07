@@ -1,7 +1,9 @@
-package com.andannn.healthconnectdemo.api
+package com.andannn.healthdata.internal.api
 
+import android.content.Context
 import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
 import java.time.Instant
@@ -31,7 +33,7 @@ class TokenExpiredException : Throwable()
 /**
  * Interface for HealthConnect API.
  */
-interface HealthConnectAPI {
+internal interface HealthConnectAPI {
 
     /**
      * Check if background sync is available.
@@ -41,14 +43,16 @@ interface HealthConnectAPI {
 
     suspend fun getGrantedPermissions(): Set<String>
 
+
     /**
      * @throws RemoteApiException
      * @throws ClientUnavailableException
      */
-    suspend fun readStepsByTimeRange(
+    suspend  fun  readRecords(
+        recordType: KClass<out Record>,
         startTime: Instant,
         endTime: Instant
-    ): List<StepsRecord>
+    ): List<Record>
 
     /**
      * Get changes from the given token.
@@ -71,4 +75,8 @@ interface HealthConnectAPI {
         recordTypes: Set<KClass<out Record>>,
         dataOriginFilters: Set<DataOrigin> = setOf()
     ): String
+}
+
+internal fun buildHealthConnectAPI(context: Context): HealthConnectAPI {
+    return HealthConnectAPIImpl(context)
 }
