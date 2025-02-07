@@ -1,4 +1,4 @@
-package com.andannn.healthdata.database
+package com.andannn.healthdata.internal.database
 
 import android.content.Context
 import android.util.Log

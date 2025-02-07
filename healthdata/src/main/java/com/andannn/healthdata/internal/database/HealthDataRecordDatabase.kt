@@ -1,4 +1,4 @@
-package com.andannn.healthdata.database
+package com.andannn.healthdata.internal.database
 
 import android.content.Context
 
@@ -10,7 +10,8 @@ fun buildHealthDataRecordDatabase(context: Context): HealthDataRecordDatabase {
     return HealthDataRecordDatabaseImpl(context)
 }
 
-internal class HealthDataRecordDatabaseImpl(private  val context: Context) : HealthDataRecordDatabase {
+internal class HealthDataRecordDatabaseImpl(private  val context: Context) :
+    HealthDataRecordDatabase {
     override fun getHealthDataRecordDao(): HealthDataRecordDao {
         return HealthDataRecordDaoImpl(context)
     }

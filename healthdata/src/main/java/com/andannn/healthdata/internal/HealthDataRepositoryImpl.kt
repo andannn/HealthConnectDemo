@@ -1,14 +1,12 @@
-package com.andannn.healthdata
+package com.andannn.healthdata.internal
 
-import com.andannn.healthdata.api.HealthConnectAPI
-import com.andannn.healthdata.database.HealthDataRecordDatabase
-import com.andannn.healthdata.worker.SyncTokenProvider
+import com.andannn.healthdata.HealthDataRepository
+import com.andannn.healthdata.internal.api.HealthConnectAPI
+import com.andannn.healthdata.internal.database.HealthDataRecordDatabase
+import com.andannn.healthdata.internal.token.SyncTokenProvider
 
-interface HealthDataRepository {
-    suspend fun isBackgroundSyncAvailable(): Boolean
-}
 
-fun buildHealthDataRepository(
+internal fun buildHealthDataRepository(
     healthConnectAPI: HealthConnectAPI,
     syncTokenProvider: SyncTokenProvider,
     database: HealthDataRecordDatabase

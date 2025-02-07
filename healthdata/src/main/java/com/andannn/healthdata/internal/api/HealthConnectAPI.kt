@@ -1,4 +1,4 @@
-package com.andannn.healthdata.api
+package com.andannn.healthdata.internal.api
 
 import android.content.Context
 import androidx.health.connect.client.changes.Change
@@ -32,7 +32,7 @@ class TokenExpiredException : Throwable()
 /**
  * Interface for HealthConnect API.
  */
-interface HealthConnectAPI {
+internal interface HealthConnectAPI {
 
     /**
      * Check if background sync is available.
@@ -74,6 +74,6 @@ interface HealthConnectAPI {
     ): String
 }
 
-fun buildHealthConnectAPI(context: Context): HealthConnectAPI {
+internal fun buildHealthConnectAPI(context: Context): HealthConnectAPI {
     return HealthConnectAPIImpl(context)
 }

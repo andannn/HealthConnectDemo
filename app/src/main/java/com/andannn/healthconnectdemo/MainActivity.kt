@@ -1,7 +1,6 @@
 package com.andannn.healthconnectdemo
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +17,7 @@ import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.lifecycle.lifecycleScope
 import com.andannn.healthconnectdemo.ui.theme.HealthConnectDemoTheme
+import com.andannn.healthdata.DataSyncHelper.registerSyncScheduleWorker
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
@@ -39,9 +39,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    private val api: com.andannn.healthdata.api.HealthConnectAPI by lazy {
-        com.andannn.healthdata.api.HealthConnectAPIImpl(this)
-    }
 //    private val serviceConnection = object : ServiceConnection {
 //        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
 //            val myBinder = binder as HealthConnectService.HealthConnectBinder
@@ -75,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
 
         lifecycleScope.launch {
-            com.andannn.healthdata.worker.SyncHelper.registerSyncScheduleWorker(application)
+            registerSyncScheduleWorker(application)
         }
         setContent {
             HealthConnectDemoTheme {
@@ -96,14 +93,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun checkPermissionsAndRun() {
-        val granted = api.getGrantedPermissions()
-        Log.d(TAG, "checkPermissionsAndRun: granted $granted")
-        if (granted.containsAll(PERMISSIONS)) {
-            // Permissions already granted; proceed with inserting or reading data
-        } else {
-            Log.d(TAG, "requestPermissionsLauncher launch: $PERMISSIONS")
-            requestPermissionsLauncher.launch(PERMISSIONS)
-        }
+//        Log.d(TAG, "checkPermissionsAndRun: granted $granted")
+//        if (granted.containsAll(PERMISSIONS)) {
+//            // Permissions already granted; proceed with inserting or reading data
+//        } else {
+//            Log.d(TAG, "requestPermissionsLauncher launch: $PERMISSIONS")
+//            requestPermissionsLauncher.launch(PERMISSIONS)
+//        }
     }
 }
 

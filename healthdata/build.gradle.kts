@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.androidx.connect.client)
     implementation(libs.androidx.work.runtime.ktx)
 
