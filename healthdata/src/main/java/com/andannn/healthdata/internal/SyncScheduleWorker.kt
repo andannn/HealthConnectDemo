@@ -9,6 +9,7 @@ import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.WeightRecord
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
@@ -32,6 +33,7 @@ private val recordTypes: Set<KClass<out Record>> = setOf(
     StepsRecord::class,
     SleepSessionRecord::class,
     HeightRecord::class,
+    WeightRecord::class,
 )
 
 internal class SyncScheduleWorker(
@@ -183,6 +185,12 @@ internal class SyncScheduleWorker(
             HeightRecord::class -> {
                 healthDataRecordDao.upsertHeightRecords(
                     records.filterIsInstance<HeightRecord>().map { it.toEntity() }
+                )
+            }
+
+            WeightRecord::class -> {
+                healthDataRecordDao.upsertWeightRecords(
+                    records.filterIsInstance<WeightRecord>().map { it.toEntity() }
                 )
             }
         }
