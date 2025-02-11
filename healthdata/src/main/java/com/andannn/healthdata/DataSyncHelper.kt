@@ -37,9 +37,9 @@ object DataSyncHelper {
             )
 
             // TODO: remove this line
-            WorkManager.getInstance(context = application).enqueue(
-                OneTimeWorkRequestBuilder<SyncScheduleWorker>().build()
-            )
+//            WorkManager.getInstance(context = application).enqueue(
+//                OneTimeWorkRequestBuilder<SyncScheduleWorker>().build()
+//            )
         } else {
             // Background reading is not available, perform read in foreground
             WorkManager.getInstance(context = application).enqueue(

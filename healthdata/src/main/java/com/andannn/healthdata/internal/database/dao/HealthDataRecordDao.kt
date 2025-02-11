@@ -44,6 +44,24 @@ internal interface HealthDataRecordDao {
     suspend fun getSleepRecords(): List<SleepSessionRecordEntity>
 
     @Query("""
+        SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}
+        """
+    )
+    suspend fun getHeightRecords(): List<HeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.WEIGHT_RECORD_TABLE}
+        """
+    )
+    suspend fun getWeightRecords(): List<WeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.SPEED_RECORD_TABLE}
+        """
+    )
+    suspend fun getSpeedRecords(): List<SpeedRecordEntity>
+
+    @Query("""
         DELETE FROM ${Tables.STEPS_RECORD_TABLE}
         WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
         """

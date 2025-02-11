@@ -107,13 +107,7 @@ internal class SyncScheduleWorker(
                 }
 
                 upsertChangeMap.forEach { (recordType, records) ->
-                    when (recordType) {
-                        StepsRecord::class -> {
-                            healthDataRecordDao.upsertStepRecords(
-                                records.filterIsInstance<StepsRecord>().map { it.toEntity() }
-                            )
-                        }
-                    }
+                    upsertRecords(healthDataRecordDao, recordType, records)
                 }
 
                 syncTokenProvider.setSyncToken(newToken)
@@ -167,7 +161,7 @@ internal class SyncScheduleWorker(
     }
 
     companion object {
-        const val INITIAL_SYNC_DAYS = 1L
+        const val INITIAL_SYNC_DAYS = 30L
     }
 }
 

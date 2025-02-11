@@ -22,7 +22,6 @@ class HealthReferenceBuilder(
     fun buildRepository(): HealthDataRepository {
         return buildHealthDataRepository(
             healthConnectAPI = healthConnectAPI,
-            syncTokenProvider = syncTokenProvider,
             database = healthDataRecordDatabase
         )
     }
