@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.andannn.healthdata.internal.database.Tables.STEPS_RECORD_TABLE
+import com.andannn.healthdata.internal.database.util.toLocalDataTime
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -32,7 +33,3 @@ internal fun StepsRecord.toEntity() = StepsRecordEntity(
     endTime = toLocalDataTime(endTime, endZoneOffset),
     count = count,
 )
-
-internal fun toLocalDataTime(
-    instant: Instant, zoneOffset: ZoneOffset? = null
-): LocalDateTime = LocalDateTime.ofInstant(instant, zoneOffset ?: ZoneId.systemDefault())

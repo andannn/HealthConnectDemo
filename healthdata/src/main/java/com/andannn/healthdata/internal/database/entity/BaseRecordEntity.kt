@@ -8,6 +8,7 @@ internal object BaseColumn {
     const val LAST_MODIFIED_TIME = "last_modified_time"
     const val START_TIME = "start_time"
     const val END_TIME = "end_time"
+    const val RECORD_TIME = "record_time"
 }
 
 internal interface BaseRecordEntity {
@@ -21,4 +22,8 @@ internal interface BaseRecordEntity {
 internal interface IntervalRecordEntity {
     val startTime: LocalDateTime
     val endTime: LocalDateTime
+}
+
+internal interface InstantaneousRecordEntity {
+    public val time: LocalDateTime
 }

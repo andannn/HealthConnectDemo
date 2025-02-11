@@ -12,22 +12,22 @@ import kotlin.reflect.KClass
 /**
  * Thrown when the client is not available.
  */
-class ClientUnavailableException(override val message: String? = null) : Throwable()
+internal class ClientUnavailableException(override val message: String? = null) : Throwable()
 
 /**
  * Thrown when the remote API call fails.
  */
-class RemoteApiException(override val message: String? = null) : Throwable()
+internal class RemoteApiException(override val message: String? = null) : Throwable()
 
 /**
  * Thrown when the client does not have the required permission.
  */
-class NoPermissionException(override val message: String? = null) : Throwable()
+internal class NoPermissionException(override val message: String? = null) : Throwable()
 
 /**
  * Thrown when the token is expired.
  */
-class TokenExpiredException : Throwable()
+internal class TokenExpiredException : Throwable()
 
 
 /**

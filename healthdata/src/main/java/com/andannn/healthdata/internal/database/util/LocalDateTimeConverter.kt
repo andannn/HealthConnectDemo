@@ -1,7 +1,10 @@
 package com.andannn.healthdata.internal.database.util
 
 import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 internal class LocalDateTimeConverter {
@@ -17,3 +20,7 @@ internal class LocalDateTimeConverter {
         return date.format(formatter)
     }
 }
+
+internal fun toLocalDataTime(
+    instant: Instant, zoneOffset: ZoneOffset? = null
+): LocalDateTime = LocalDateTime.ofInstant(instant, zoneOffset ?: ZoneId.systemDefault())

@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.andannn.healthdata.internal.database.Tables.SLEEP_SESSION_RECORD_TABLE
+import com.andannn.healthdata.internal.database.util.toLocalDataTime
 import java.time.LocalDateTime
 
 internal object SleepSessionRecordColumn {

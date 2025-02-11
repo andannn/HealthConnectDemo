@@ -7,8 +7,11 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.andannn.healthdata.internal.database.Tables
 import com.andannn.healthdata.internal.database.entity.BaseColumn
+import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
+import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
+import com.andannn.healthdata.internal.database.entity.WeightRecordEntity
 
 @Dao
 internal interface HealthDataRecordDao {
@@ -18,6 +21,15 @@ internal interface HealthDataRecordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertSleepRecords(sleepSessionRecord: List<SleepSessionRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertHeightRecords(heightRecord: List<HeightRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertWeightRecords(weightRecord: List<WeightRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertRecords(records: List<SpeedRecordEntity>)
 
     @Query("""
         SELECT * FROM ${Tables.STEPS_RECORD_TABLE}
@@ -32,11 +44,36 @@ internal interface HealthDataRecordDao {
     suspend fun getSleepRecords(): List<SleepSessionRecordEntity>
 
     @Query("""
+        SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}
+        """
+    )
+    suspend fun getHeightRecords(): List<HeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.WEIGHT_RECORD_TABLE}
+        """
+    )
+    suspend fun getWeightRecords(): List<WeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.SPEED_RECORD_TABLE}
+        """
+    )
+    suspend fun getSpeedRecords(): List<SpeedRecordEntity>
+
+    @Query("""
         DELETE FROM ${Tables.STEPS_RECORD_TABLE}
         WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
         """
     )
     suspend fun deleteStepRecordsByIds(deletedRecordIds: List<String>)
+
+    @Query("""
+        DELETE FROM ${Tables.HEIGHT_RECORD_TABLE}
+        WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
+        """
+    )
+    suspend fun deleteHeightRecordsByIds(deletedRecordIds: List<String>)
 
     @Query("""
         DELETE FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}
@@ -45,9 +82,11 @@ internal interface HealthDataRecordDao {
     )
     suspend fun deleteSleepRecordsByIds(deletedRecordIds: List<String>)
 
+
     @Transaction
     suspend fun deleteRecordsByIds(deletedRecordIds: List<String>) {
         deleteStepRecordsByIds(deletedRecordIds)
         deleteSleepRecordsByIds(deletedRecordIds)
+        deleteHeightRecordsByIds(deletedRecordIds)
     }
 }
