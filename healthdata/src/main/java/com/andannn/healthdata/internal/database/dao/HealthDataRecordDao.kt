@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.andannn.healthdata.internal.database.Tables
 import com.andannn.healthdata.internal.database.entity.BaseColumn
+import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
 
@@ -18,6 +19,9 @@ internal interface HealthDataRecordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertSleepRecords(sleepSessionRecord: List<SleepSessionRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertHeightRecords(heightRecord: List<HeightRecordEntity>)
 
     @Query("""
         SELECT * FROM ${Tables.STEPS_RECORD_TABLE}
@@ -39,15 +43,24 @@ internal interface HealthDataRecordDao {
     suspend fun deleteStepRecordsByIds(deletedRecordIds: List<String>)
 
     @Query("""
+        DELETE FROM ${Tables.HEIGHT_RECORD_TABLE}
+        WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
+        """
+    )
+    suspend fun deleteHeightRecordsByIds(deletedRecordIds: List<String>)
+
+    @Query("""
         DELETE FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}
         WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
         """
     )
     suspend fun deleteSleepRecordsByIds(deletedRecordIds: List<String>)
 
+
     @Transaction
     suspend fun deleteRecordsByIds(deletedRecordIds: List<String>) {
         deleteStepRecordsByIds(deletedRecordIds)
         deleteSleepRecordsByIds(deletedRecordIds)
+        deleteHeightRecordsByIds(deletedRecordIds)
     }
 }

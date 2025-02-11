@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -30,6 +31,7 @@ private const val TAG = "SyncScheduleWorker"
 private val recordTypes: Set<KClass<out Record>> = setOf(
     StepsRecord::class,
     SleepSessionRecord::class,
+    HeightRecord::class,
 )
 
 internal class SyncScheduleWorker(
@@ -175,6 +177,12 @@ internal class SyncScheduleWorker(
             SleepSessionRecord::class -> {
                 healthDataRecordDao.upsertSleepRecords(
                     records.filterIsInstance<SleepSessionRecord>().map { it.toEntity() }
+                )
+            }
+
+            HeightRecord::class -> {
+                healthDataRecordDao.upsertHeightRecords(
+                    records.filterIsInstance<HeightRecord>().map { it.toEntity() }
                 )
             }
         }

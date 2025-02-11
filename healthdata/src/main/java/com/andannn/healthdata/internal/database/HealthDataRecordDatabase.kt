@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.andannn.healthdata.internal.database.dao.HealthDataRecordDao
+import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
 import com.andannn.healthdata.internal.database.util.LocalDateTimeConverter
@@ -13,12 +14,14 @@ import com.andannn.healthdata.internal.database.util.LocalDateTimeConverter
 internal object Tables {
     const val STEPS_RECORD_TABLE = "steps_record_table"
     const val SLEEP_SESSION_RECORD_TABLE = "sleep_session_record_table"
+    const val HEIGHT_RECORD_TABLE = "height_record_table"
 }
 
 @Database(
     entities = [
         StepsRecordEntity::class,
         SleepSessionRecordEntity::class,
+        HeightRecordEntity::class,
     ],
     version = 1
 )
