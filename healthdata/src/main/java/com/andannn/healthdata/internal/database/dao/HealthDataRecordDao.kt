@@ -9,6 +9,7 @@ import com.andannn.healthdata.internal.database.Tables
 import com.andannn.healthdata.internal.database.entity.BaseColumn
 import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
+import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
 import com.andannn.healthdata.internal.database.entity.WeightRecordEntity
 
@@ -26,6 +27,9 @@ internal interface HealthDataRecordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertWeightRecords(weightRecord: List<WeightRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertRecords(records: List<SpeedRecordEntity>)
 
     @Query("""
         SELECT * FROM ${Tables.STEPS_RECORD_TABLE}

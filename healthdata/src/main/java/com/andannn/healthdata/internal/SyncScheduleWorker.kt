@@ -8,6 +8,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.work.CoroutineWorker
@@ -34,6 +35,7 @@ private val recordTypes: Set<KClass<out Record>> = setOf(
     SleepSessionRecord::class,
     HeightRecord::class,
     WeightRecord::class,
+    SpeedRecord::class,
 )
 
 internal class SyncScheduleWorker(
@@ -161,43 +163,50 @@ internal class SyncScheduleWorker(
             endTime = Instant.now()
         )
 
-        upsertRecords(recordType, records)
-    }
-
-    private suspend fun upsertRecords(
-        recordType: KClass<out Record>,
-        records: List<Record>
-    ) {
-        Log.d(TAG, "upsertRecords: recordType $recordType, records ${records.size}")
-        when (recordType) {
-            StepsRecord::class -> {
-                healthDataRecordDao.upsertStepRecords(
-                    records.filterIsInstance<StepsRecord>().map { it.toEntity() }
-                )
-            }
-
-            SleepSessionRecord::class -> {
-                healthDataRecordDao.upsertSleepRecords(
-                    records.filterIsInstance<SleepSessionRecord>().map { it.toEntity() }
-                )
-            }
-
-            HeightRecord::class -> {
-                healthDataRecordDao.upsertHeightRecords(
-                    records.filterIsInstance<HeightRecord>().map { it.toEntity() }
-                )
-            }
-
-            WeightRecord::class -> {
-                healthDataRecordDao.upsertWeightRecords(
-                    records.filterIsInstance<WeightRecord>().map { it.toEntity() }
-                )
-            }
-        }
+        upsertRecords(healthDataRecordDao, recordType, records)
     }
 
     companion object {
-        const val INITIAL_SYNC_DAYS = 30L
+        const val INITIAL_SYNC_DAYS = 1L
+    }
+}
+
+private suspend fun upsertRecords(
+    dao: HealthDataRecordDao,
+    recordType: KClass<out Record>,
+    records: List<Record>
+) {
+    Log.d(TAG, "upsertRecords: recordType $recordType, records ${records.size}")
+    when (recordType) {
+        StepsRecord::class -> {
+            dao.upsertStepRecords(
+                records.filterIsInstance<StepsRecord>().map { it.toEntity() }
+            )
+        }
+
+        SleepSessionRecord::class -> {
+            dao.upsertSleepRecords(
+                records.filterIsInstance<SleepSessionRecord>().map { it.toEntity() }
+            )
+        }
+
+        HeightRecord::class -> {
+            dao.upsertHeightRecords(
+                records.filterIsInstance<HeightRecord>().map { it.toEntity() }
+            )
+        }
+
+        WeightRecord::class -> {
+            dao.upsertWeightRecords(
+                records.filterIsInstance<WeightRecord>().map { it.toEntity() }
+            )
+        }
+
+        SpeedRecord::class -> {
+            dao.upsertRecords(
+                records.filterIsInstance<SpeedRecord>().map { it.toEntity() }
+            )
+        }
     }
 }
 
