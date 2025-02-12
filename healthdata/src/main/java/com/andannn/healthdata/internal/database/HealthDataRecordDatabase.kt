@@ -1,12 +1,14 @@
 package com.andannn.healthdata.internal.database
 
 import android.content.Context
+import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.andannn.healthdata.internal.database.dao.HealthDataRecordDao
+import com.andannn.healthdata.internal.database.entity.DistanceRecordEntity
 import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
@@ -20,6 +22,7 @@ internal object Tables {
     const val HEIGHT_RECORD_TABLE = "height_record_table"
     const val WEIGHT_RECORD_TABLE = "weight_record_table"
     const val SPEED_RECORD_TABLE = "speed_record_table"
+    const val DISTANCE_RECORD_TABLE = "distance_record_table"
 }
 
 @Database(
@@ -29,6 +32,7 @@ internal object Tables {
         HeightRecordEntity::class,
         WeightRecordEntity::class,
         SpeedRecordEntity::class,
+        DistanceRecordEntity::class,
     ],
     version = 1
 )

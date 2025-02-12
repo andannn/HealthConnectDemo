@@ -12,6 +12,16 @@ import java.util.concurrent.TimeUnit
 private const val TAG = "SyncScheduleWorker"
 
 object DataSyncHelper {
+
+    /**
+     * Perform a one-time sync of data from HealthConnect API.
+     */
+    fun doOneTimeSync(application: Application) {
+        WorkManager.getInstance(context = application).enqueue(
+            OneTimeWorkRequestBuilder<SyncScheduleWorker>().build()
+        )
+    }
+
     /**
      * Register a worker to sync data from HealthConnect API.
      * If background sync is not available, perform the sync in the foreground.
