@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.andannn.healthdata.internal.database.Tables
 import com.andannn.healthdata.internal.database.entity.BaseColumn
+import com.andannn.healthdata.internal.database.entity.DistanceRecordEntity
 import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
@@ -29,7 +30,10 @@ internal interface HealthDataRecordDao {
     suspend fun upsertWeightRecords(weightRecord: List<WeightRecordEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertRecords(records: List<SpeedRecordEntity>)
+    suspend fun upsertSpeedRecords(records: List<SpeedRecordEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun  upsertDistanceRecords(speedRecord: List<DistanceRecordEntity>)
 
     @Query("""
         SELECT * FROM ${Tables.STEPS_RECORD_TABLE}
