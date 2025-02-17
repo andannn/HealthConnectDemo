@@ -41,8 +41,10 @@ internal interface HealthConnectAPI {
     suspend fun isBackgroundSyncAvailable(): Boolean
 
 
+    /**
+     * Get the granted permissions.
+     */
     suspend fun getGrantedPermissions(): Set<String>
-
 
     /**
      * @throws RemoteApiException

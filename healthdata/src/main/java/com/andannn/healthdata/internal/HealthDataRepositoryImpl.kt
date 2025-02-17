@@ -3,6 +3,7 @@ package com.andannn.healthdata.internal
 import com.andannn.healthdata.HealthDataRepository
 import com.andannn.healthdata.internal.api.HealthConnectAPI
 import com.andannn.healthdata.internal.database.HealthDataRecordDatabase
+import java.time.Instant
 
 
 internal fun buildHealthDataRepository(
@@ -28,6 +29,11 @@ internal class HealthDataRepositoryImpl(
 
     override suspend fun getSteps(): List<String> {
         return dao.getStepRecords().reversed().map { it.toString() }
+    }
+
+    override suspend fun getStepsByTimeRange(startTime: Instant, endTime: Instant): List<String> {
+        return dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+            .reversed().map { it.toString() }
     }
 
     override suspend fun getSleeps(): List<String> {

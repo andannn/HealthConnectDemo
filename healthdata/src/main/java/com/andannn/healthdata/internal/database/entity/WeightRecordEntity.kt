@@ -5,8 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.andannn.healthdata.internal.database.Tables
-import com.andannn.healthdata.internal.database.util.toLocalDataTime
-import java.time.LocalDateTime
 
 internal object WeightColumn {
     const val WEIGHT_KILOGRAMS = "weight_kilograms"
@@ -20,9 +18,9 @@ internal data class WeightRecordEntity(
     @ColumnInfo(name = BaseColumn.DATA_ORIGIN_PACKAGE_NAME)
     override val dataOriginPackageName: String,
     @ColumnInfo(name = BaseColumn.LAST_MODIFIED_TIME)
-    override val lastModifiedTime: LocalDateTime,
+    override val lastModifiedTime: Long,
     @ColumnInfo(name = BaseColumn.RECORD_TIME)
-    override val time: LocalDateTime,
+    override val time: Long,
     @ColumnInfo(name = WeightColumn.WEIGHT_KILOGRAMS)
     val weightKilograms: Double
 ) : BaseRecordEntity, InstantaneousRecordEntity
@@ -30,7 +28,7 @@ internal data class WeightRecordEntity(
 internal fun WeightRecord.toEntity() = WeightRecordEntity(
     id = metadata.id,
     dataOriginPackageName = metadata.dataOrigin.packageName,
-    lastModifiedTime = toLocalDataTime(metadata.lastModifiedTime),
-    time = toLocalDataTime(time),
+    lastModifiedTime = metadata.lastModifiedTime.toEpochMilli(),
+    time = time.toEpochMilli(),
     weightKilograms = weight.inKilograms
 )

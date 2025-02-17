@@ -12,6 +12,7 @@ import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
 import java.io.IOException
 import java.time.Instant
@@ -83,19 +84,37 @@ internal class HealthConnectAPIImpl(
         recordType: KClass<out Record>,
         startTime: Instant,
         endTime: Instant
-    ) =
-        withClientOrThrow(context) { client ->
-            val response = wrapException {
+    ) = withClientOrThrow(context) { client ->
+        Log.d(TAG, "read start. recordType $recordType, startTime $startTime, endTime $endTime")
+        val recordsResult = mutableListOf<Record>()
+        var currentResponse: ReadRecordsResponse<out Record>?
+        var nextPageToken: String? = null
+        while (true) {
+            currentResponse = wrapException {
                 client.readRecords(
                     ReadRecordsRequest(
                         recordType,
-                        timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                        timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                        pageToken = nextPageToken
                     )
                 )
             }
 
-            response.records
+            Log.d(TAG, "readRecords: currentResponse ${currentResponse.records.size}, nextToken ${currentResponse.pageToken}")
+
+            nextPageToken = currentResponse.pageToken
+            recordsResult.addAll(currentResponse.records)
+
+            if (currentResponse.pageToken == null) {
+                // No more pages
+                break
+            }
         }
+
+        recordsResult.also {
+            Log.d(TAG, "read finished. records size: ${it.size}")
+        }
+    }
 }
 
 private inline fun <T> wrapException(block: () -> T): T {

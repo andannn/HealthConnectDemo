@@ -42,6 +42,13 @@ internal interface HealthDataRecordDao {
     suspend fun getStepRecords(): List<StepsRecordEntity>
 
     @Query("""
+        SELECT * FROM ${Tables.STEPS_RECORD_TABLE}
+        WHERE ${BaseColumn.START_TIME} >= :startTime AND ${BaseColumn.END_TIME} <= :endTime
+        """
+    )
+    suspend fun getStepRecordsByTimeRange(startTime: Long, endTime: Long): List<StepsRecordEntity>
+
+    @Query("""
         SELECT * FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}
         """
     )

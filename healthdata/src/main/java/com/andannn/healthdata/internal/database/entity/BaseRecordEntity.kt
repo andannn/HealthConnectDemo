@@ -16,14 +16,14 @@ internal interface BaseRecordEntity {
 
     val dataOriginPackageName: String
 
-    val lastModifiedTime: LocalDateTime
+    val lastModifiedTime: Long
 }
 
 internal interface IntervalRecordEntity {
-    val startTime: LocalDateTime
-    val endTime: LocalDateTime
+    val startTime: Long
+    val endTime: Long
 }
 
 internal interface InstantaneousRecordEntity {
-    public val time: LocalDateTime
+    public val time: Long
 }
