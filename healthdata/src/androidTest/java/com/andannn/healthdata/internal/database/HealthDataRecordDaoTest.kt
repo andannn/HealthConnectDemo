@@ -12,10 +12,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import java.time.Instant
 
 
 @RunWith(AndroidJUnit4::class)
@@ -43,21 +43,19 @@ class HealthDataRecordDaoTest {
     private val stepsRecord = StepsRecordEntity(
         id = "1",
         dataOriginPackageName = "com.google.android.apps.health",
-        lastModifiedTime = LocalDateTime.now(),
-        startTime = LocalDateTime.now(),
-        endTime = LocalDateTime.now(),
+        lastModifiedTime = Instant.now().toEpochMilli(),
+        startTime = Instant.now().toEpochMilli(),
+        endTime = Instant.now().toEpochMilli(),
         count = 1000
     )
     private val newStepsRecord = StepsRecordEntity(
         id = "1",
         dataOriginPackageName = "com.google.android.apps.health",
-        lastModifiedTime = LocalDateTime.now(),
-        startTime = LocalDateTime.now(),
-        endTime = LocalDateTime.now(),
+        lastModifiedTime = Instant.now().toEpochMilli(),
+        startTime = Instant.now().toEpochMilli(),
+        endTime = Instant.now().toEpochMilli(),
         count = 1001
     )
-
-
 
     @Test
     fun upsertStepRecordTest() = testScope.runTest {
@@ -87,5 +85,44 @@ class HealthDataRecordDaoTest {
 
         val result = dao.getStepRecords()
         assertEquals(0, result.size)
+    }
+
+    @Test
+    fun getStepByTimeRangeTest() = testScope.runTest {
+        val steps = listOf(
+            StepsRecordEntity(
+                id = "1",
+                dataOriginPackageName = "com.google.android.apps.health",
+                lastModifiedTime = Instant.now().toEpochMilli(),
+                startTime = Instant.parse("2025-01-01T00:00:00Z").toEpochMilli(),
+                endTime = Instant.parse("2025-01-02T00:00:00Z").toEpochMilli(),
+                count = 1000
+            ),
+            StepsRecordEntity(
+                id = "2",
+                dataOriginPackageName = "com.google.android.apps.health",
+                lastModifiedTime = Instant.now().toEpochMilli(),
+                startTime = Instant.parse("2025-01-02T00:00:00Z").toEpochMilli(),
+                endTime = Instant.parse("2025-01-03T00:00:00Z").toEpochMilli(),
+                count = 1000
+            ),
+            StepsRecordEntity(
+                id = "3",
+                dataOriginPackageName = "com.google.android.apps.health",
+                lastModifiedTime = Instant.now().toEpochMilli(),
+                startTime = Instant.parse("2025-01-03T00:00:00Z").toEpochMilli(),
+                endTime = Instant.parse("2025-01-04T00:00:00Z").toEpochMilli(),
+                count = 1000
+            ),
+
+        )
+        dao.upsertStepRecords(steps)
+
+        val result = dao.getStepRecordsByTimeRange(
+            startTime = Instant.parse("2025-01-01T12:00:00Z").toEpochMilli(),
+            endTime = Instant.parse("2025-01-03T12:00:00Z").toEpochMilli()
+        )
+        assertEquals(1, result.size)
+        assertEquals(steps[1], result[0])
     }
 }

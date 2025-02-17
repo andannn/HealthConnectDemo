@@ -45,11 +45,6 @@ object DataSyncHelper {
                 ExistingPeriodicWorkPolicy.KEEP,
                 periodicWorkRequest
             )
-
-            // TODO: remove this line
-//            WorkManager.getInstance(context = application).enqueue(
-//                OneTimeWorkRequestBuilder<SyncScheduleWorker>().build()
-//            )
         } else {
             // Background reading is not available, perform read in foreground
             WorkManager.getInstance(context = application).enqueue(

@@ -5,11 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.andannn.healthdata.internal.database.Tables.STEPS_RECORD_TABLE
-import com.andannn.healthdata.internal.database.util.toLocalDataTime
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 internal object StepRecordColumns {
     const val COUNT = "step_count"
@@ -19,17 +14,17 @@ internal object StepRecordColumns {
 internal data class StepsRecordEntity(
     @ColumnInfo(name = BaseColumn.ID) @PrimaryKey override val id: String,
     @ColumnInfo(name = BaseColumn.DATA_ORIGIN_PACKAGE_NAME) override val dataOriginPackageName: String,
-    @ColumnInfo(name = BaseColumn.LAST_MODIFIED_TIME) override val lastModifiedTime: LocalDateTime,
-    @ColumnInfo(name = BaseColumn.START_TIME) override val startTime: LocalDateTime,
-    @ColumnInfo(name = BaseColumn.END_TIME) override val endTime: LocalDateTime,
+    @ColumnInfo(name = BaseColumn.LAST_MODIFIED_TIME) override val lastModifiedTime: Long,
+    @ColumnInfo(name = BaseColumn.START_TIME) override val startTime: Long,
+    @ColumnInfo(name = BaseColumn.END_TIME) override val endTime: Long,
     @ColumnInfo(name = StepRecordColumns.COUNT) val count: Long,
 ) : BaseRecordEntity, IntervalRecordEntity
 
 internal fun StepsRecord.toEntity() = StepsRecordEntity(
     id = metadata.id,
     dataOriginPackageName = metadata.dataOrigin.packageName,
-    lastModifiedTime = toLocalDataTime(metadata.lastModifiedTime),
-    startTime = toLocalDataTime(startTime, startZoneOffset),
-    endTime = toLocalDataTime(endTime, endZoneOffset),
+    lastModifiedTime = metadata.lastModifiedTime.toEpochMilli(),
+    startTime = startTime.toEpochMilli(),
+    endTime = endTime.toEpochMilli(),
     count = count,
 )

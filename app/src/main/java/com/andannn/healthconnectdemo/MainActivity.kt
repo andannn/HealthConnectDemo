@@ -57,37 +57,8 @@ class MainActivity : ComponentActivity() {
         (application as HealthRepositoryProvider).repository
     }
 
-//    private val serviceConnection = object : ServiceConnection {
-//        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-//            val myBinder = binder as HealthConnectService.HealthConnectBinder
-//            api = myBinder.getService()
-//
-//            lifecycleScope.launch {
-//                checkPermissionsAndRun()
-//                api!!.foo()
-//                api!!.readStepsByTimeRange(
-//                    startTime = java.time.Instant.now().minus(1, ChronoUnit.HOURS),
-//                    endTime = java.time.Instant.now()
-//                )
-//                while (true) {
-//                    delay(1000)
-////                    api?.foo()
-//                }
-//            }
-//        }
-//
-//        override fun onServiceDisconnected(name: ComponentName?) {
-//        }
-//    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-//        val intent = Intent(this, HealthConnectService::class.java)
-//
-//        startService(intent)
-//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-
 
         lifecycleScope.launch {
             registerSyncScheduleWorker(application)
@@ -165,38 +136,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-//        unbindService(serviceConnection)
-    }
-
-    private suspend fun checkPermissionsAndRun() {
-//        Log.d(TAG, "checkPermissionsAndRun: granted $granted")
-//        if (granted.containsAll(PERMISSIONS)) {
-//            // Permissions already granted; proceed with inserting or reading data
-//        } else {
-//            Log.d(TAG, "requestPermissionsLauncher launch: $PERMISSIONS")
-//            requestPermissionsLauncher.launch(PERMISSIONS)
-//        }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HealthConnectDemoTheme {
-        Greeting("Android")
     }
 }
 
