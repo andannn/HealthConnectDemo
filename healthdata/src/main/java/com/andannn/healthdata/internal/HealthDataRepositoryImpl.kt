@@ -4,6 +4,7 @@ import com.andannn.healthdata.HealthDataRepository
 import com.andannn.healthdata.internal.api.HealthConnectAPI
 import com.andannn.healthdata.internal.database.HealthDataRecordDatabase
 import com.andannn.healthdata.internal.util.InstantSerializerModuleBuilder
+import com.andannn.healthdata.model.HealthData
 import com.andannn.healthdata.model.toModel
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -60,5 +61,16 @@ internal class HealthDataRepositoryImpl(
         return dao.getHeightRecords().sortedBy {
             it.time
         }.reversed().map { json.encodeToString(it.toModel()) }
+    }
+
+    override suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData {
+        val stepRecords = dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+        val totalSteps = stepRecords.fold(0L) { acc, stepRecord ->
+            acc + stepRecord.count
+        }
+
+        return HealthData(
+            stepCount = totalSteps,
+        )
     }
 }

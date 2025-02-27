@@ -1,5 +1,6 @@
 package com.andannn.healthdata
 
+import com.andannn.healthdata.model.HealthData
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -27,4 +28,6 @@ interface HealthDataRepository {
 
     // Temporary method to get data for testing
     suspend fun getHeights(): List<String>
+
+    suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData
 }

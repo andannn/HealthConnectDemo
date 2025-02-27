@@ -35,6 +35,7 @@ import com.andannn.healthconnectdemo.ui.theme.HealthConnectDemoTheme
 import com.andannn.healthdata.DataSyncHelper.registerSyncScheduleWorker
 import com.andannn.healthdata.HealthRepositoryProvider
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 private const val TAG = "MainActivity"
 val PERMISSIONS =
@@ -86,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        val weights = when(selected)  {
+                        val weights = when (selected) {
                             Type.STEPS -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -94,13 +95,20 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.HEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getHeights()
+                                        value = listOf(
+                                            repository.getHealthData(
+                                                Instant.now().minusSeconds(3600 * 12),
+                                                Instant.now(),
+                                            ).toString()
+                                        )
                                     }
                                 }
                             }
+
                             Type.WEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -108,6 +116,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.SLEEP -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -115,6 +124,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.SPEED -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -125,7 +135,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         LazyColumn {
-                            items(weights.value, key = {it}) {
+                            items(weights.value, key = { it }) {
                                 Text(text = it)
 
                                 HorizontalDivider()
