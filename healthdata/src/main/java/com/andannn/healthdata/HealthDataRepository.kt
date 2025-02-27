@@ -1,5 +1,6 @@
 package com.andannn.healthdata
 
+import com.andannn.healthdata.model.BodyMeasurementData
 import com.andannn.healthdata.model.HealthData
 import java.time.Instant
 import java.time.LocalDateTime
@@ -30,4 +31,7 @@ interface HealthDataRepository {
     suspend fun getHeights(): List<String>
 
     suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData
+
+    // TODO get newest data???
+    suspend fun getBodyMeasurementData(): BodyMeasurementData
 }

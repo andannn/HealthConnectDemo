@@ -1,7 +1,5 @@
 package com.andannn.healthdata.internal.database.entity
 
-import java.time.LocalDateTime
-
 internal object BaseColumn {
     const val ID = "step_record_id"
     const val DATA_ORIGIN_PACKAGE_NAME = "data_origin_package_name"

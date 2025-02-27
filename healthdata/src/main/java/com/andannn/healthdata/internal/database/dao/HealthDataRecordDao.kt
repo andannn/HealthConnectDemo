@@ -91,6 +91,20 @@ internal interface HealthDataRecordDao {
     suspend fun getSpeedRecords(): List<SpeedRecordEntity>
 
     @Query("""
+        SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}
+        ORDER BY ${BaseColumn.RECORD_TIME} DESC
+        LIMIT 1;
+    """)
+    suspend fun getLatestHeight(): HeightRecordEntity?
+
+    @Query("""
+        SELECT * FROM ${Tables.WEIGHT_RECORD_TABLE}
+        ORDER BY ${BaseColumn.RECORD_TIME} DESC
+        LIMIT 1;
+    """)
+    suspend fun getLatestWeight(): WeightRecordEntity?
+
+    @Query("""
         DELETE FROM ${Tables.STEPS_RECORD_TABLE}
         WHERE ${BaseColumn.ID} IN (:deletedRecordIds)
         """

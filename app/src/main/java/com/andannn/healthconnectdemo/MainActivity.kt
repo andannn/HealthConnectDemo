@@ -103,7 +103,8 @@ class MainActivity : ComponentActivity() {
                                             repository.getHealthData(
                                                 Instant.now().minusSeconds(3600 * 12),
                                                 Instant.now(),
-                                            ).toString()
+                                            ).toString(),
+                                            repository.getBodyMeasurementData().toString(),
                                         )
                                     }
                                 }

@@ -4,6 +4,7 @@ import com.andannn.healthdata.HealthDataRepository
 import com.andannn.healthdata.internal.api.HealthConnectAPI
 import com.andannn.healthdata.internal.database.HealthDataRecordDatabase
 import com.andannn.healthdata.internal.util.InstantSerializerModuleBuilder
+import com.andannn.healthdata.model.BodyMeasurementData
 import com.andannn.healthdata.model.HealthData
 import com.andannn.healthdata.model.toModel
 import kotlinx.serialization.json.Json
@@ -35,7 +36,7 @@ internal class HealthDataRepositoryImpl(
     }
 
     override suspend fun getWeights(): List<String> {
-        return dao.getWeightRecords().reversed().map { json.encodeToString(it) }
+        return dao.getWeightRecords().reversed().map { it.toString() }
     }
 
     override suspend fun getSteps(): List<String> {
@@ -66,25 +67,33 @@ internal class HealthDataRepositoryImpl(
     override suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData {
         val stepRecords =
             dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
-        val totalSteps = stepRecords.fold(0L) { acc, stepRecord ->
-            acc + stepRecord.count
-        }
+        val totalSteps =
+            with(stepRecords) { if (isEmpty()) null else sumOf { it.count } }
 
         val distanceRecords =
             dao.getDistanceRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
-        val totalDistance = distanceRecords.fold(0.0) { acc, distanceRecord ->
-            acc + distanceRecord.distanceInMeters
-        }
+        val totalDistance =
+            with(distanceRecords) { if (isEmpty()) null else sumOf { it.distanceInMeters } }
 
-        val caloriesRecords = dao.getCaloriesRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
-        val totalCalories = caloriesRecords.fold(0.0) { acc, caloriesRecord ->
-            acc + caloriesRecord.energyInCalorie
-        }
+        val caloriesRecords =
+            dao.getCaloriesRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+        val totalCalories =
+            with(caloriesRecords) { if (isEmpty()) null else sumOf { it.energyInCalorie } }
 
         return HealthData(
             stepCount = totalSteps,
             distance = totalDistance,
             energy = totalCalories
+        )
+    }
+
+    override suspend fun getBodyMeasurementData(): BodyMeasurementData {
+        val height = dao.getLatestHeight()?.heightMeters
+        val weight = dao.getLatestWeight()?.weightKilograms
+
+        return BodyMeasurementData(
+            height = height,
+            weight = weight
         )
     }
 }
