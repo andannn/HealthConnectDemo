@@ -10,6 +10,7 @@ import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
+import com.andannn.healthdata.internal.database.entity.TotalCaloriesBurnedRecordEntity
 import com.andannn.healthdata.internal.database.entity.WeightRecordEntity
 
 internal object Tables {
@@ -19,6 +20,8 @@ internal object Tables {
     const val WEIGHT_RECORD_TABLE = "weight_record_table"
     const val SPEED_RECORD_TABLE = "speed_record_table"
     const val DISTANCE_RECORD_TABLE = "distance_record_table"
+    const val TOTAL_CALORIES_BURNED_RECORD_TABLE = "total_calories_burned_record_table"
+
 }
 
 @Database(
@@ -29,6 +32,7 @@ internal object Tables {
         WeightRecordEntity::class,
         SpeedRecordEntity::class,
         DistanceRecordEntity::class,
+        TotalCaloriesBurnedRecordEntity::class,
     ],
     version = 1
 )

@@ -50,11 +50,11 @@ internal class HealthDataRepositoryImpl(
     }
 
     override suspend fun getSleeps(): List<String> {
-        return dao.getSleepRecords().reversed().map { json.encodeToString(it) }
+        return dao.getSleepRecords().reversed().map { it.toString() }
     }
 
     override suspend fun getSpeeds(): List<String> {
-        return dao.getSpeedRecords().reversed().map { json.encodeToString(it) }
+        return dao.getSpeedRecords().reversed().map { it.toString() }
     }
 
     override suspend fun getHeights(): List<String> {
@@ -64,13 +64,27 @@ internal class HealthDataRepositoryImpl(
     }
 
     override suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData {
-        val stepRecords = dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+        val stepRecords =
+            dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
         val totalSteps = stepRecords.fold(0L) { acc, stepRecord ->
             acc + stepRecord.count
         }
 
+        val distanceRecords =
+            dao.getDistanceRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+        val totalDistance = distanceRecords.fold(0.0) { acc, distanceRecord ->
+            acc + distanceRecord.distanceInMeters
+        }
+
+        val caloriesRecords = dao.getCaloriesRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
+        val totalCalories = caloriesRecords.fold(0.0) { acc, caloriesRecord ->
+            acc + caloriesRecord.energyInCalorie
+        }
+
         return HealthData(
             stepCount = totalSteps,
+            distance = totalDistance,
+            energy = totalCalories
         )
     }
 }

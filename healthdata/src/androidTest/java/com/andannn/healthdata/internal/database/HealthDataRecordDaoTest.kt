@@ -125,4 +125,9 @@ class HealthDataRecordDaoTest {
         assertEquals(1, result.size)
         assertEquals(steps[1], result[0])
     }
+
+    @Test
+    fun getDistanceByTimeRangeTest() = testScope.runTest {
+
+    }
 }

@@ -12,6 +12,7 @@ import com.andannn.healthdata.internal.database.entity.HeightRecordEntity
 import com.andannn.healthdata.internal.database.entity.SleepSessionRecordEntity
 import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
+import com.andannn.healthdata.internal.database.entity.TotalCaloriesBurnedRecordEntity
 import com.andannn.healthdata.internal.database.entity.WeightRecordEntity
 
 @Dao
@@ -35,6 +36,9 @@ internal interface HealthDataRecordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun  upsertDistanceRecords(speedRecord: List<DistanceRecordEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertCaloriesRecords(caloriesRecord: List<TotalCaloriesBurnedRecordEntity>)
+
     @Query("""
         SELECT * FROM ${Tables.STEPS_RECORD_TABLE}
         """
@@ -47,6 +51,20 @@ internal interface HealthDataRecordDao {
         """
     )
     suspend fun getStepRecordsByTimeRange(startTime: Long, endTime: Long): List<StepsRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.DISTANCE_RECORD_TABLE}
+        WHERE ${BaseColumn.START_TIME} >= :startTime AND ${BaseColumn.END_TIME} <= :endTime
+        """
+    )
+    suspend fun getDistanceRecordsByTimeRange(startTime: Long, endTime: Long): List<DistanceRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.TOTAL_CALORIES_BURNED_RECORD_TABLE}
+        WHERE ${BaseColumn.START_TIME} >= :startTime AND ${BaseColumn.END_TIME} <= :endTime
+        """
+    )
+    suspend fun getCaloriesRecordsByTimeRange(startTime: Long, endTime: Long): List<TotalCaloriesBurnedRecordEntity>
 
     @Query("""
         SELECT * FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}

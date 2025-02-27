@@ -11,6 +11,7 @@ import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
@@ -37,7 +38,8 @@ private val recordTypes: Set<KClass<out Record>> = setOf(
     HeightRecord::class,
     WeightRecord::class,
     SpeedRecord::class,
-    DistanceRecord::class
+    DistanceRecord::class,
+    TotalCaloriesBurnedRecord::class,
 )
 
 internal class SyncScheduleWorker(
@@ -207,6 +209,12 @@ private suspend fun upsertRecords(
         DistanceRecord::class -> {
             dao.upsertDistanceRecords(
                 records.filterIsInstance<DistanceRecord>().map { it.toEntity() }
+            )
+        }
+
+        TotalCaloriesBurnedRecord::class -> {
+            dao.upsertCaloriesRecords(
+                records.filterIsInstance<TotalCaloriesBurnedRecord>().map { it.toEntity() }
             )
         }
     }
