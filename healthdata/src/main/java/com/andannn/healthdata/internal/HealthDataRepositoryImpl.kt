@@ -75,7 +75,7 @@ internal class HealthDataRepositoryImpl(
             .map { it.toModel() }
     }
 
-    override suspend fun getAggravatedHealthData(startTime: Instant, endTime: Instant): HealthData {
+    override suspend fun getAggregateHealthData(startTime: Instant, endTime: Instant): HealthData {
         val stepRecords =
             dao.getStepRecordsByTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli())
         val totalSteps =

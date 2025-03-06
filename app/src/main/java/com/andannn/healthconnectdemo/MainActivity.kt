@@ -173,7 +173,7 @@ class MainActivity : ComponentActivity() {
                                 produceState(emptyList<String>()) {
                                     launch {
                                         value = listOf(
-                                            repository.getAggravatedHealthData(
+                                            repository.getAggregateHealthData(
                                                 Instant.now().minusSeconds(3600 * 12),
                                                 Instant.now(),
                                             ).toString()

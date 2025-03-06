@@ -63,9 +63,9 @@ interface HealthDataRepository {
     suspend fun getDistance(startTime: Instant, endTime: Instant): List<DistanceRecordModel>
 
     /**
-     * Get health data for the given time range
+     * Get the aggregate health data for the given time range
      */
-    suspend fun getAggravatedHealthData(startTime: Instant, endTime: Instant): HealthData
+    suspend fun getAggregateHealthData(startTime: Instant, endTime: Instant): HealthData
 
     /**
      * Get the latest body measurement data
