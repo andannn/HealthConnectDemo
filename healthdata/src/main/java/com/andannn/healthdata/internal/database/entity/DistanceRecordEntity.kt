@@ -1,6 +1,7 @@
 package com.andannn.healthdata.internal.database.entity
 
 import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.metadata.Device.Companion.TYPE_UNKNOWN
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -23,13 +24,16 @@ internal data class DistanceRecordEntity(
     override val startTime: Long,
     @ColumnInfo(name = BaseColumn.END_TIME)
     override val endTime: Long,
+    @ColumnInfo(name = BaseColumn.DEVICE_TYPE)
+    override val deviceType: Int,
     @ColumnInfo(name = DistanceColumn.DISTANCE_IN_METERS)
     val distanceInMeters: Double,
-) : BaseRecordEntity, IntervalRecordEntity
+) : IntervalRecordEntity
 
 internal fun DistanceRecord.toEntity() = DistanceRecordEntity(
     id = metadata.id,
     dataOriginPackageName = metadata.dataOrigin.packageName,
+    deviceType = metadata.device?.type ?: TYPE_UNKNOWN,
     lastModifiedTime = metadata.lastModifiedTime.toEpochMilli(),
     startTime = startTime.toEpochMilli(),
     endTime = endTime.toEpochMilli(),

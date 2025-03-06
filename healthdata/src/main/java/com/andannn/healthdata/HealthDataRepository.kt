@@ -1,37 +1,74 @@
 package com.andannn.healthdata
 
 import com.andannn.healthdata.model.BodyMeasurementData
+import com.andannn.healthdata.model.DistanceRecordModel
 import com.andannn.healthdata.model.HealthData
+import com.andannn.healthdata.model.HeightRecordModel
+import com.andannn.healthdata.model.SleepSessionModel
+import com.andannn.healthdata.model.SpeedRecordModel
+import com.andannn.healthdata.model.StepRecordModel
+import com.andannn.healthdata.model.TotalCaloriesBurnedRecordModel
+import com.andannn.healthdata.model.WeightRecordModel
 import java.time.Instant
-import java.time.LocalDateTime
 
 interface HealthRepositoryProvider {
     val repository: HealthDataRepository
 }
 
+/**
+ * Repository for Health Data
+ */
 interface HealthDataRepository {
+    /**
+     * Returns true if background sync is available, false otherwise
+     */
     suspend fun isBackgroundSyncAvailable(): Boolean
 
-    // Temporary method to get data for testing
-    suspend fun getWeights(): List<String>
+    /**
+     * Get all sleep sessions for the given time range
+     */
+    suspend fun getSleeps(startTime: Instant, endTime: Instant): List<SleepSessionModel>
 
-    // Temporary method to get data for testing
-    suspend fun getSteps(): List<String>
+    /**
+     * Get all speed records for the given time range
+     */
+    suspend fun getSpeeds(startTime: Instant, endTime: Instant): List<SpeedRecordModel>
 
-    // Temporary method to get data for testing
-    suspend fun getStepsByTimeRange(startTime: Instant, endTime: Instant): List<String>
+    /**
+     * Get all step records for the given time range
+     */
+    suspend fun getSteps(startTime: Instant, endTime: Instant): List<StepRecordModel>
 
-    // Temporary method to get data for testing
-    suspend fun getSleeps(): List<String>
+    /**
+     * Get all height records for the given time range
+     */
+    suspend fun getHeights(startTime: Instant, endTime: Instant): List<HeightRecordModel>
 
-    // Temporary method to get data for testing
-    suspend fun getSpeeds(): List<String>
+    /**
+     * Get all weight records for the given time range
+     */
+    suspend fun getWeights(startTime: Instant, endTime: Instant): List<WeightRecordModel>
 
-    // Temporary method to get data for testing
-    suspend fun getHeights(): List<String>
+    /**
+     * Get all total calories burned records for the given time range
+     */
+    suspend fun getTotalCaloriesBurned(
+        startTime: Instant,
+        endTime: Instant
+    ): List<TotalCaloriesBurnedRecordModel>
 
-    suspend fun getHealthData(startTime: Instant, endTime: Instant): HealthData
+    /**
+     * Get all distance records for the given time range
+     */
+    suspend fun getDistance(startTime: Instant, endTime: Instant): List<DistanceRecordModel>
 
-    // TODO get newest data???
-    suspend fun getBodyMeasurementData(): BodyMeasurementData
+    /**
+     * Get health data for the given time range
+     */
+    suspend fun getAggravatedHealthData(startTime: Instant, endTime: Instant): HealthData
+
+    /**
+     * Get the latest body measurement data
+     */
+    suspend fun getLatestBodyMeasurementData(): BodyMeasurementData
 }

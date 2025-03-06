@@ -3,29 +3,22 @@ package com.andannn.healthconnectdemo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
@@ -91,7 +84,10 @@ class MainActivity : ComponentActivity() {
                             Type.STEPS -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getSteps()
+                                        value = repository.getSteps(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
                                     }
                                 }
                             }
@@ -99,13 +95,11 @@ class MainActivity : ComponentActivity() {
                             Type.HEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = listOf(
-                                            repository.getHealthData(
+                                        value =
+                                            repository.getHeights(
                                                 Instant.now().minusSeconds(3600 * 12),
                                                 Instant.now(),
-                                            ).toString(),
-                                            repository.getBodyMeasurementData().toString(),
-                                        )
+                                            ).map { it.toString() }
                                     }
                                 }
                             }
@@ -113,7 +107,10 @@ class MainActivity : ComponentActivity() {
                             Type.WEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getWeights()
+                                        value = repository.getWeights(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
                                     }
                                 }
                             }
@@ -121,7 +118,10 @@ class MainActivity : ComponentActivity() {
                             Type.SLEEP -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getSleeps()
+                                        value = repository.getSleeps(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
                                     }
                                 }
                             }
@@ -129,7 +129,55 @@ class MainActivity : ComponentActivity() {
                             Type.SPEED -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getSpeeds()
+                                        value = repository.getSpeeds(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
+                                    }
+                                }
+                            }
+
+                            Type.DISTANCE -> {
+                                produceState(emptyList<String>()) {
+                                    launch {
+                                        value = repository.getDistance(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
+                                    }
+                                }
+                            }
+
+                            Type.CALORIES -> {
+                                produceState(emptyList<String>()) {
+                                    launch {
+                                        value = repository.getTotalCaloriesBurned(
+                                            Instant.now().minusSeconds(3600 * 12),
+                                            Instant.now(),
+                                        ).map { it.toString() }
+                                    }
+                                }
+                            }
+
+                            Type.BODY_DATA -> {
+                                produceState(emptyList<String>()) {
+                                    launch {
+                                        value = listOf(
+                                            repository.getLatestBodyMeasurementData().toString()
+                                        )
+                                    }
+                                }
+                            }
+
+                            Type.AGGRAVATED_DATA -> {
+                                produceState(emptyList<String>()) {
+                                    launch {
+                                        value = listOf(
+                                            repository.getAggravatedHealthData(
+                                                Instant.now().minusSeconds(3600 * 12),
+                                                Instant.now(),
+                                            ).toString()
+                                        )
                                     }
                                 }
                             }
@@ -150,9 +198,13 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class Type {
+    AGGRAVATED_DATA,
+    BODY_DATA,
     STEPS,
     HEIGHT,
     WEIGHT,
     SLEEP,
     SPEED,
+    DISTANCE,
+    CALORIES,
 }

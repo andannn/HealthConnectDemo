@@ -1,6 +1,7 @@
 package com.andannn.healthdata.internal.database.entity
 
 import androidx.health.connect.client.records.WeightRecord
+import androidx.health.connect.client.records.metadata.Device.Companion.TYPE_UNKNOWN
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -22,11 +23,14 @@ internal data class WeightRecordEntity(
     @ColumnInfo(name = BaseColumn.RECORD_TIME)
     override val time: Long,
     @ColumnInfo(name = WeightColumn.WEIGHT_KILOGRAMS)
-    val weightKilograms: Double
-) : BaseRecordEntity, InstantaneousRecordEntity
+    val weightKilograms: Double,
+    @ColumnInfo(name = BaseColumn.DEVICE_TYPE)
+    override val deviceType: Int,
+) : InstantaneousRecordEntity
 
 internal fun WeightRecord.toEntity() = WeightRecordEntity(
     id = metadata.id,
+    deviceType = metadata.device?.type ?: TYPE_UNKNOWN,
     dataOriginPackageName = metadata.dataOrigin.packageName,
     lastModifiedTime = metadata.lastModifiedTime.toEpochMilli(),
     time = time.toEpochMilli(),
