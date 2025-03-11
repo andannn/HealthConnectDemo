@@ -8,6 +8,8 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -33,6 +35,7 @@ import com.andannn.healthconnectdemo.ui.theme.HealthConnectDemoTheme
 import com.andannn.healthdata.DataSyncHelper.registerSyncScheduleWorker
 import com.andannn.healthdata.HealthRepositoryProvider
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 private const val TAG = "MainActivity"
 val PERMISSIONS =
@@ -84,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        val weights = when(selected)  {
+                        val weights = when (selected) {
                             Type.STEPS -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -92,13 +95,21 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.HEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
-                                        value = repository.getHeights()
+                                        value = listOf(
+                                            repository.getHealthData(
+                                                Instant.now().minusSeconds(3600 * 12),
+                                                Instant.now(),
+                                            ).toString(),
+                                            repository.getBodyMeasurementData().toString(),
+                                        )
                                     }
                                 }
                             }
+
                             Type.WEIGHT -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -106,6 +117,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.SLEEP -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -113,6 +125,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             Type.SPEED -> {
                                 produceState(emptyList<String>()) {
                                     launch {
@@ -122,15 +135,12 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        Column(
-                            modifier = Modifier.verticalScroll(rememberScrollState())
-                        ) {
-                            weights.value.forEach {
+                        LazyColumn {
+                            items(weights.value, key = { it }) {
                                 Text(text = it)
 
                                 HorizontalDivider()
                             }
-
                         }
                     }
                 }
