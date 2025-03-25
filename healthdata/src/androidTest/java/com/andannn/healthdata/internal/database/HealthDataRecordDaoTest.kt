@@ -46,6 +46,7 @@ class HealthDataRecordDaoTest {
         lastModifiedTime = Instant.now().toEpochMilli(),
         startTime = Instant.now().toEpochMilli(),
         endTime = Instant.now().toEpochMilli(),
+        deviceType = 0,
         count = 1000
     )
     private val newStepsRecord = StepsRecordEntity(
@@ -54,6 +55,7 @@ class HealthDataRecordDaoTest {
         lastModifiedTime = Instant.now().toEpochMilli(),
         startTime = Instant.now().toEpochMilli(),
         endTime = Instant.now().toEpochMilli(),
+        deviceType = 0,
         count = 1001
     )
 
@@ -96,6 +98,7 @@ class HealthDataRecordDaoTest {
                 lastModifiedTime = Instant.now().toEpochMilli(),
                 startTime = Instant.parse("2025-01-01T00:00:00Z").toEpochMilli(),
                 endTime = Instant.parse("2025-01-02T00:00:00Z").toEpochMilli(),
+                deviceType = 0,
                 count = 1000
             ),
             StepsRecordEntity(
@@ -104,6 +107,7 @@ class HealthDataRecordDaoTest {
                 lastModifiedTime = Instant.now().toEpochMilli(),
                 startTime = Instant.parse("2025-01-02T00:00:00Z").toEpochMilli(),
                 endTime = Instant.parse("2025-01-03T00:00:00Z").toEpochMilli(),
+                deviceType = 0,
                 count = 1000
             ),
             StepsRecordEntity(
@@ -112,6 +116,7 @@ class HealthDataRecordDaoTest {
                 lastModifiedTime = Instant.now().toEpochMilli(),
                 startTime = Instant.parse("2025-01-03T00:00:00Z").toEpochMilli(),
                 endTime = Instant.parse("2025-01-04T00:00:00Z").toEpochMilli(),
+                deviceType = 0,
                 count = 1000
             ),
 

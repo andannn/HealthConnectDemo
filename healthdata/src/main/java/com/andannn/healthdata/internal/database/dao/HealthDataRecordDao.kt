@@ -14,6 +14,7 @@ import com.andannn.healthdata.internal.database.entity.SpeedRecordEntity
 import com.andannn.healthdata.internal.database.entity.StepsRecordEntity
 import com.andannn.healthdata.internal.database.entity.TotalCaloriesBurnedRecordEntity
 import com.andannn.healthdata.internal.database.entity.WeightRecordEntity
+import com.andannn.healthdata.model.SleepSessionModel
 
 @Dao
 internal interface HealthDataRecordDao {
@@ -67,28 +68,34 @@ internal interface HealthDataRecordDao {
     suspend fun getCaloriesRecordsByTimeRange(startTime: Long, endTime: Long): List<TotalCaloriesBurnedRecordEntity>
 
     @Query("""
+        SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}
+        WHERE ${BaseColumn.RECORD_TIME} >= :startTime AND ${BaseColumn.RECORD_TIME} <= :endTime
+    """)
+    suspend fun getHeightRecordsByTimeRange(startTime: Long, endTime: Long): List<HeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.WEIGHT_RECORD_TABLE}
+        WHERE ${BaseColumn.RECORD_TIME} >= :startTime AND ${BaseColumn.RECORD_TIME} <= :endTime
+    """)
+    suspend fun getWeightRecordsByTimeRange(startTime: Long, endTime: Long): List<WeightRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.SPEED_RECORD_TABLE}
+        WHERE ${BaseColumn.START_TIME} >= :startTime AND ${BaseColumn.END_TIME} <= :endTime
+    """)
+    suspend fun getSpeedRecordsByTimeRange(startTime: Long, endTime: Long): List<SpeedRecordEntity>
+
+    @Query("""
+        SELECT * FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}
+        WHERE ${BaseColumn.START_TIME} >= :startTime AND ${BaseColumn.END_TIME} <= :endTime
+    """)
+    suspend fun getSleepRecordsByTimeRange(startTime: Long, endTime: Long): List<SleepSessionRecordEntity>
+
+    @Query("""
         SELECT * FROM ${Tables.SLEEP_SESSION_RECORD_TABLE}
         """
     )
     suspend fun getSleepRecords(): List<SleepSessionRecordEntity>
-
-    @Query("""
-        SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}
-        """
-    )
-    suspend fun getHeightRecords(): List<HeightRecordEntity>
-
-    @Query("""
-        SELECT * FROM ${Tables.WEIGHT_RECORD_TABLE}
-        """
-    )
-    suspend fun getWeightRecords(): List<WeightRecordEntity>
-
-    @Query("""
-        SELECT * FROM ${Tables.SPEED_RECORD_TABLE}
-        """
-    )
-    suspend fun getSpeedRecords(): List<SpeedRecordEntity>
 
     @Query("""
         SELECT * FROM ${Tables.HEIGHT_RECORD_TABLE}

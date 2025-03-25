@@ -1,6 +1,7 @@
 package com.andannn.healthdata.internal.database.entity
 
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.metadata.Device.Companion.TYPE_UNKNOWN
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,10 +19,12 @@ internal data class TotalCaloriesBurnedRecordEntity(
     @ColumnInfo(name = BaseColumn.START_TIME) override val startTime: Long,
     @ColumnInfo(name = BaseColumn.END_TIME) override val endTime: Long,
     @ColumnInfo(name = TotalCaloriesBurnedRecordColumns.ENERGY_IN_CALORIE) val energyInCalorie: Double,
+    @ColumnInfo(name = BaseColumn.DEVICE_TYPE) override val deviceType: Int,
 ) : IntervalRecordEntity, BaseRecordEntity
 
 internal fun TotalCaloriesBurnedRecord.toEntity() = TotalCaloriesBurnedRecordEntity(
     id = metadata.id,
+    deviceType = metadata.device?.type ?: TYPE_UNKNOWN,
     dataOriginPackageName = metadata.dataOrigin.packageName,
     lastModifiedTime = metadata.lastModifiedTime.toEpochMilli(),
     startTime = startTime.toEpochMilli(),

@@ -7,6 +7,7 @@ internal object BaseColumn {
     const val START_TIME = "start_time"
     const val END_TIME = "end_time"
     const val RECORD_TIME = "record_time"
+    const val DEVICE_TYPE = "device_type"
 }
 
 internal interface BaseRecordEntity {
@@ -15,13 +16,15 @@ internal interface BaseRecordEntity {
     val dataOriginPackageName: String
 
     val lastModifiedTime: Long
+
+    val deviceType: Int
 }
 
-internal interface IntervalRecordEntity {
+internal interface IntervalRecordEntity: BaseRecordEntity {
     val startTime: Long
     val endTime: Long
 }
 
-internal interface InstantaneousRecordEntity {
-    public val time: Long
+internal interface InstantaneousRecordEntity: BaseRecordEntity {
+    val time: Long
 }
